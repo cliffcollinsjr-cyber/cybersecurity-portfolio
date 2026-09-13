@@ -31,7 +31,7 @@ jobs:
         working-directory: cloud-security/terraform/${{ matrix.cloud }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3 # production: pin to commit SHA
         with:
@@ -53,7 +53,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Checkov Terraform scan
         uses: bridgecrewio/checkov-action@v12 # production: pin to commit SHA
         with:
@@ -71,7 +71,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Trivy config / misconfig (fs)
         uses: aquasecurity/trivy-action@v0.36.0 # production: pin to commit SHA
         with:
@@ -92,7 +92,7 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       # Requires Dependency graph: Settings → Code security → Dependency graph.
       # Graph is enabled; enforce on PRs (main runs already succeeded).
       - name: Dependency review
@@ -110,7 +110,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Setup Python
         uses: actions/setup-python@v5 # production: pin to commit SHA
         with:
