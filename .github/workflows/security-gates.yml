@@ -109,7 +109,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4 # production: pin to commit SHA
       - name: Setup Python
-        uses: actions/setup-python@v5 # production: pin to commit SHA
+        uses: actions/setup-python@v7 # production: pin to commit SHA
         with:
           python-version: "3.12"
       - name: pip-audit (Python requirements)
