@@ -1,0 +1,28 @@
+{
+  "SecurityGroups": [
+    {
+      "GroupId": "sg-demo0001",
+      "GroupName": "demo-bastion-bad",
+      "IpPermissions": [
+        {
+          "FromPort": 22,
+          "ToPort": 22,
+          "IpProtocol": "tcp",
+          "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "DEMO intentional misconfig"}]
+        }
+      ]
+    },
+    {
+      "GroupId": "sg-demo0002",
+      "GroupName": "demo-app-ok",
+      "IpPermissions": [
+        {
+          "FromPort": 443,
+          "ToPort": 443,
+          "IpProtocol": "tcp",
+          "IpRanges": [{"CidrIp": "10.42.0.0/16"}]
+        }
+      ]
+    }
+  ]
+}

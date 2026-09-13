@@ -1,0 +1,15 @@
+# [DEMO] Correlate proxy URL click with subsequent auth
+# Hypothesis: credential phishing → login attempt within 30m
+# Indexes/sourcetypes are placeholders — replace for your lab
+
+index=proxy sourcetype=web:proxy url_category="phishing" OR url="*login*" user=*
+| eval click_time=_time
+| stats earliest(click_time) as first_click by user, url, src_ip
+| join type=inner user [
+    search index=auth sourcetype=okta:sso OR sourcetype=azure:signin
+    | eval auth_time=_time
+    | stats count as auth_events, values(action) as actions, earliest(auth_time) as first_auth by user
+]
+| where first_auth >= first_click AND first_auth <= first_click + 1800
+| table user, url, src_ip, first_click, first_auth, auth_events, actions
+| sort - first_click

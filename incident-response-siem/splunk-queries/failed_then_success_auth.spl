@@ -1,0 +1,8 @@
+# [DEMO] Password spray / stuffing pattern: many failures then success
+
+index=auth (action=failure OR action=success)
+| bin _time span=15m
+| stats count(eval(action=="failure")) as failures, count(eval(action=="success")) as successes by user, src_ip, _time
+| where failures > 20 AND successes > 0
+| table _time, user, src_ip, failures, successes
+| sort - failures

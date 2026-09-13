@@ -1,0 +1,42 @@
+# [DEMO] SOAR playbook — User Containment (approval-gated)
+name: user_containment_demo
+version: "1.0"
+label: "[DEMO]"
+description: >
+  Propose identity containment steps. Never auto-revokes without approval in this design.
+
+triggers:
+  - type: analyst_manual
+  - type: identity_risk_alert
+
+inputs:
+  - user_upn
+  - reason
+  - ticket_id
+
+steps:
+  - id: enrich_user
+    action: idp.get_user_risk
+    params:
+      user: "{{user_upn}}"
+
+  - id: propose_session_revoke
+    action: idp.propose_revoke_sessions
+    approval_required: true
+    params:
+      user: "{{user_upn}}"
+
+  - id: propose_password_reset
+    action: idp.propose_password_reset
+    approval_required: true
+
+  - id: propose_disable
+    action: idp.propose_disable_account
+    approval_required: true
+    when: "{{enrich_user.risk}} == high"
+
+  - id: document
+    action: ticketing.comment
+    params:
+      ticket_id: "{{ticket_id}}"
+      body: "Containment proposals submitted for approval"

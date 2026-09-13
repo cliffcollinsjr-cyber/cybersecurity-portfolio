@@ -1,0 +1,7 @@
+// [DEMO] Join device logons with cloud sign-in anomalies (illustrative multi-table hunt)
+IdentityLogonEvents
+| where Timestamp > ago(2d)
+| where ActionType == "LogonSuccess"
+| summarize LogonCount=count(), Countries=make_set(Country) by AccountUpn, bin(Timestamp, 1h)
+| where array_length(Countries) > 1
+| project Timestamp, AccountUpn, Countries, LogonCount

@@ -1,0 +1,65 @@
+# [DEMO] SOAR playbook design — Phishing Triage
+name: phishing_triage_demo
+version: "1.0"
+label: "[DEMO]"
+description: >
+  Enrich reported phishing, search similar mail, propose containment actions.
+  Destructive steps require human approval.
+
+triggers:
+  - type: email_report
+  - type: splunk_notable
+    search_name: "DEMO - Phishing Click Correlation"
+
+inputs:
+  - message_id
+  - reporter_user
+  - subject
+  - urls
+  - attachment_hashes
+
+steps:
+  - id: create_ticket
+    action: ticketing.create_ticket
+    params:
+      project: SOC-DEMO
+      summary: "Phishing report: {{subject}}"
+
+  - id: enrich_urls
+    action: custom.enrich_iocs
+    params:
+      iocs: "{{urls}}"
+      ioc_type: url
+
+  - id: enrich_hashes
+    action: custom.enrich_iocs
+    params:
+      iocs: "{{attachment_hashes}}"
+      ioc_type: sha256
+
+  - id: splunk_prevalence
+    action: splunk.run_query
+    params:
+      query: "index=email [DEMO] earliest=-24h subject=*{{subject}}* | stats count by user"
+
+  - id: decision_malicious
+    action: decide
+    when: "{{enrich_urls.any_malicious}} or {{enrich_hashes.any_malicious}}"
+    then:
+      - id: propose_mailbox_purge
+        action: email.search_and_propose_purge
+        approval_required: true
+      - id: propose_url_block
+        action: proxy.propose_block
+        approval_required: true
+    else:
+      - id: close_benign_candidate
+        action: ticketing.comment
+        params:
+          body: "No malicious IOCs in enrichment — analyst review"
+
+  - id: notify_slack
+    action: notify.slack
+    params:
+      channel: "#soc-demo"
+      message: "Phishing triage complete for ticket {{create_ticket.id}}"

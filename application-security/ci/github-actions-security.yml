@@ -1,0 +1,50 @@
+# [DEMO] Sample GitHub Actions workflow — SAST + dependency scanning gates
+# Place as .github/workflows/security.yml in an application repo you maintain.
+name: security-gates-demo
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  sast-semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep SAST (demo)
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/ci
+        continue-on-error: false
+
+  python-safety-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install and scan requirements if present
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+            pip install pip-audit
+            pip-audit -r requirements.txt
+          else
+            echo "No requirements.txt — skip [DEMO]"
+          fi

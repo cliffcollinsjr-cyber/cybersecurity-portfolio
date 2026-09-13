@@ -1,0 +1,8 @@
+// [DEMO] Suspicious PowerShell with encoded command or download cradles
+// Advanced Hunting — DeviceProcessEvents
+DeviceProcessEvents
+| where Timestamp > ago(7d)
+| where FileName in~ ("powershell.exe", "pwsh.exe")
+| where ProcessCommandLine has_any ("-enc", "-EncodedCommand", "DownloadString", "Invoke-WebRequest", "IEX")
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName, ReportId
+| top 100 by Timestamp desc

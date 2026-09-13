@@ -1,0 +1,43 @@
+# [DEMO] Intended security policy snippets — NOT live device config
+# Owner: Cliff Collins Jr — portfolio example
+
+metadata:
+  environment: lab-demo
+  panorama_device_group: DG-DEMO-LAB
+  label: "[DEMO] policy-as-code intent"
+
+rules:
+  - name: allow-inside-to-server-web-appid
+    action: allow
+    from_zones: [inside]
+    to_zones: [server]
+    sources: [net-users-demo]
+    destinations: [net-app-tier-demo]
+    applications: [ssl, web-browsing]
+    services: [application-default]
+    users: [any]
+    profile_group: pg-strict-demo
+    log_end: true
+    description: "Users to internal web apps via App-ID"
+
+  - name: allow-mgmt-to-panorama
+    action: allow
+    from_zones: [mgmt]
+    to_zones: [mgmt]
+    sources: [fw-mgmt-demo]
+    destinations: [panorama-demo]
+    applications: [panorama]
+    services: [application-default]
+    profile_group: pg-mgmt-demo
+    log_end: true
+
+  - name: deny-inside-to-outside-risky-apps
+    action: deny
+    from_zones: [inside]
+    to_zones: [outside]
+    sources: [any]
+    destinations: [any]
+    applications: [peer-to-peer, anonymizer]
+    services: [any]
+    log_end: true
+    description: "Explicit deny for high-risk apps"

@@ -1,0 +1,12 @@
+{
+  "alert_id": "ALERT-DEMO-1001",
+  "title": "[DEMO] Suspicious outbound connection after phishing click",
+  "severity": "high",
+  "hostname": "WS-DEMO-042",
+  "user": "jdoe_demo",
+  "iocs": {
+    "ips": ["203.0.113.50", "8.8.8.8"],
+    "domains": ["login-demo.example"],
+    "hashes": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
+  }
+}

@@ -1,0 +1,8 @@
+// [DEMO] Large file copies to removable media
+DeviceFileEvents
+| where Timestamp > ago(7d)
+| where DriveType == "Removable"
+| where ActionType == "FileCreated"
+| summarize FileCount=count(), TotalSize=sum(FileSize) by DeviceName, InitiatingProcessAccountName, bin(Timestamp, 1h)
+| where TotalSize > 100MB or FileCount > 50
+| order by TotalSize desc

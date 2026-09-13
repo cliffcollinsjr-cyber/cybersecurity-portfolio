@@ -1,0 +1,8 @@
+// [DEMO] Processes creating remote threads or accessing sensitive processes (illustrative)
+// Prefer DeviceEvents ActionType for production hunts; tune heavily before alerting.
+DeviceEvents
+| where Timestamp > ago(24h)
+| where ActionType in ("ProcessCreated", "OpenProcessApiCall")
+| where FileName has_any ("procdump", "mimikatz") or FolderPath has @"\Temp\"
+| project Timestamp, DeviceName, ActionType, FileName, FolderPath, InitiatingProcessAccountName
+| top 50 by Timestamp desc

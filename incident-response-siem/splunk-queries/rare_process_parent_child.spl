@@ -1,0 +1,9 @@
+# [DEMO] Rare parent→child process pairs on endpoints
+# Hunting: unusual LOLBins / unexpected spawn chains
+
+index=endpoint sourcetype=WinEventLog:Sysmon EventCode=1
+| eval pair=parent_process_name+" -> "+process_name
+| stats dc(host) as hosts, count as executions, values(user) as users by pair
+| where hosts < 5 AND executions < 20
+| sort hosts, executions
+| head 50

@@ -1,0 +1,10 @@
+# [DEMO] Periodic DNS to rare domains (possible C2 beaconing pattern)
+# Note: statistical heuristic only — high false positive rate; validate carefully
+
+index=dns sourcetype=dns:query
+| bin _time span=1m
+| stats count as qpm by src_ip, query, _time
+| stats avg(qpm) as avg_qpm, stdev(qpm) as std_qpm, count as intervals, dc(query) as unique_queries by src_ip
+| where intervals > 30 AND std_qpm < 0.5 AND unique_queries < 5
+| sort - intervals
+| head 25
