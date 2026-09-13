@@ -14,7 +14,8 @@ done < <(find "$ROOT" -type f \( -name '*.pem' -o -name '*.pfx' -o -name '.env' 
 if command -v python3 >/dev/null; then
   while IFS= read -r py; do
     python3 -m py_compile "$py" || errors=1
-  done < <(find "$ROOT/soc-automation/python-alert-enrichment" -name '*.py' -not -path '*/.venv/*')
+  done < <(find "$ROOT/soc-automation/python-alert-enrichment" "$ROOT/detection-as-code" \
+    -name '*.py' -not -path '*/.venv/*' 2>/dev/null)
 fi
 
 # Go fmt check

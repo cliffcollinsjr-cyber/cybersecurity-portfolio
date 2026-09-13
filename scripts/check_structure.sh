@@ -12,6 +12,7 @@ REQUIRED=(
   application-security
   security-research
   iac-cicd-security
+  detection-as-code
   LAB-ETHICS.md
   README.md
 )

@@ -1,0 +1,25 @@
+# [DEMO] Microsoft Defender / Advanced Hunting style detection definition
+id: DET-DEFENDER-DEMO-001
+title: Encoded PowerShell on device
+platform: microsoft_defender
+status: experimental
+severity: high
+mitre:
+  - T1059.001
+description: >
+  KQL-oriented detection idea for DeviceProcessEvents showing encoded
+  PowerShell. Pair with investigation checklist before response actions.
+kql: |
+  DeviceProcessEvents
+  | where Timestamp > ago(1d)
+  | where FileName in~ ("powershell.exe", "pwsh.exe")
+  | where ProcessCommandLine has_any ("-enc", "-EncodedCommand")
+  | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+condition_keywords:
+  - powershell
+  - -enc
+  - -EncodedCommand
+false_positives:
+  - Packaged software installers that wrap encoded scripts (validate publisher)
+references:
+  - edr-microsoft-defender/kql/suspicious_powershell.kql

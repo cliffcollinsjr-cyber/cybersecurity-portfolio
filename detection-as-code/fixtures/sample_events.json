@@ -1,0 +1,42 @@
+{
+  "label": "[DEMO]",
+  "description": "Synthetic process events for detection-as-code unit tests",
+  "events": [
+    {
+      "event_id": "EVT-DEMO-001",
+      "host": "lab-win10-19",
+      "user": "jordan.lee",
+      "process_name": "powershell.exe",
+      "command_line": "powershell.exe -NoProfile -EncodedCommand UwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwA=",
+      "parent_process": "WINWORD.EXE",
+      "should_match": true
+    },
+    {
+      "event_id": "EVT-DEMO-002",
+      "host": "lab-win10-07",
+      "user": "alex.rivera",
+      "process_name": "pwsh.exe",
+      "command_line": "pwsh.exe -enc RQBjAGgAbwAgACcARABlAG0AbwAnAA==",
+      "parent_process": "explorer.exe",
+      "should_match": true
+    },
+    {
+      "event_id": "EVT-DEMO-003",
+      "host": "lab-win10-03",
+      "user": "sam.nguyen",
+      "process_name": "powershell.exe",
+      "command_line": "powershell.exe -NoProfile -File C:\\Scripts\\backup.ps1",
+      "parent_process": "services.exe",
+      "should_match": false
+    },
+    {
+      "event_id": "EVT-DEMO-004",
+      "host": "lab-win10-11",
+      "user": "ops.bot",
+      "process_name": "cmd.exe",
+      "command_line": "cmd.exe /c echo hello",
+      "parent_process": "explorer.exe",
+      "should_match": false
+    }
+  ]
+}

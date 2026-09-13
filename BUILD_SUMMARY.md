@@ -4,18 +4,26 @@
 **Owner attribution:** Cliff Collins Jr  
 **Content class:** lab / DEMO / template only — see LAB-ETHICS.md
 
-## Domains delivered (10/10)
+## Recent additions (2026-09)
+
+- Root README **About** + GitHub Actions badges (`ci-portfolio`, `security-gates`)
+- AppSec DEMO finding: `application-security/findings/DEMO-2026-06-idor-export-api.md`
+- Full IR case: `incident-response-siem/cases/DEMO-IR-2026-07-phishing-to-host.md`
+- Detection-as-code lite: `detection-as-code/` (YAML + fixture + `make test-dac`)
+
+## Domains delivered (11)
 
 1. `security-research/` — DEMO case studies (Entra illicit consent; multi-cloud toxic combination)
-2. `incident-response-siem/` — Splunk + CrowdStrike IR (+ DEMO hunt reports)
+2. `incident-response-siem/` — Splunk + CrowdStrike IR (+ DEMO hunt reports + **DEMO IR case**)
 3. `pentesting/` — lab-safe methodology & reporting (no exploits)
 4. `soc-automation/` — Python + Go + PowerShell
-5. `edr-microsoft-defender/` — KQL + playbooks + detections (+ DEMO hunt reports)
-6. `firewall-palo-alto-ngfw/` — ops runbooks + policy-as-code
-7. `cloud-security/` — Terraform AWS/Azure/GCP + CIS + scripts
-8. `splunk-soar/` — playbook designs + custom function stubs
-9. `application-security/` — SDLC, CI gates, STRIDE, OWASP
-10. `iac-cicd-security/` — live GHA gates, OIDC patterns, pipeline/Terraform hardening
+5. `detection-as-code/` — Splunk + Defender detection YAML, fixtures, pytest
+6. `edr-microsoft-defender/` — KQL + playbooks + detections (+ DEMO hunt reports)
+7. `firewall-palo-alto-ngfw/` — ops runbooks + policy-as-code
+8. `cloud-security/` — Terraform AWS/Azure/GCP + CIS + scripts
+9. `splunk-soar/` — playbook designs + custom function stubs
+10. `application-security/` — SDLC, CI gates, STRIDE, OWASP (+ **DEMO finding**)
+11. `iac-cicd-security/` — live GHA gates, OIDC patterns, pipeline/Terraform hardening
 
 ## Root files
 
@@ -149,12 +157,25 @@
 - `splunk-soar/playbooks/user_containment.yaml`
 - `splunk-soar/runbooks/soar-splunk-ticketing.md`
 
-**Total source/docs files (excl. venv/binary):** ~135
+- `application-security/findings/README.md`
+- `application-security/findings/DEMO-2026-06-idor-export-api.md`
+- `incident-response-siem/cases/README.md`
+- `incident-response-siem/cases/DEMO-IR-2026-07-phishing-to-host.md`
+- `detection-as-code/README.md`
+- `detection-as-code/detections/splunk_encoded_powershell.yml`
+- `detection-as-code/detections/defender_encoded_powershell.yml`
+- `detection-as-code/fixtures/sample_events.json`
+- `detection-as-code/src/helpers.py`
+- `detection-as-code/tests/test_detections.py`
+- `scripts/test_dac.sh`
+
+**Total source/docs files (excl. venv/binary):** ~150+
 
 ## Verification
 
-- `make check-structure` — required domains include `security-research` and `iac-cicd-security`
-- `make test-python` / `scripts/test_python.sh` — pytest (6 passed)
+- `make check-structure` — required domains include `security-research`, `iac-cicd-security`, `detection-as-code`
+- `make test-python` / `scripts/test_python.sh` — enrichment pytest + `make test-dac`
+- `make test-dac` / `scripts/test_dac.sh` — detection-as-code pytest
 - `make build-go` / `scripts/build_go.sh` — `go build` succeeds
 - `make lint` / `scripts/lint.sh` — structure/syntax/gofmt guards
 - Terraform `fmt -check` + `init -backend=false` + `validate` for aws/azure/gcp

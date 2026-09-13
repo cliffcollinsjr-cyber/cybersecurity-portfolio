@@ -38,3 +38,10 @@ DEMO research notes under `security-research/` describe **misconfigurations and 
 
 OIDC trust policies, IAM roles, and Azure federated-credential snippets under `iac-cicd-security/` use **placeholder** account IDs, tenant IDs, subscription IDs, and repo names. They are not wired to a live cloud account. GitHub Actions in this repo run `terraform fmt` / `validate` / IaC scanners with **no cloud secrets** (`terraform init -backend=false`).
 
+## AppSec findings & IR cases
+
+Write-ups under `application-security/findings/` and `incident-response-siem/cases/` are **`[DEMO]`** narratives for hiring review. They describe classes of issues (e.g., missing object-level authorization) and IR process at a high level. They do **not** include exploit payloads, phishing kits, or instructions for attacking third-party systems.
+
+## Detection-as-code samples
+
+YAML detections and JSON fixtures under `detection-as-code/` use synthetic process command lines for unit tests only. They are not production correlation searches and must be tuned and authorized before any deployment.
