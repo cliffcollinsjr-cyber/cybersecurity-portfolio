@@ -10,6 +10,7 @@ REQUIRED=(
   cloud-security
   splunk-soar
   application-security
+  security-research
   LAB-ETHICS.md
   README.md
 )

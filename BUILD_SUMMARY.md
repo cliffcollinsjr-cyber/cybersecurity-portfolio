@@ -4,16 +4,17 @@
 **Owner attribution:** Cliff Collins Jr  
 **Content class:** lab / DEMO / template only — see LAB-ETHICS.md
 
-## Domains delivered (8/8)
+## Domains delivered (9/9)
 
-1. `incident-response-siem/` — Splunk + CrowdStrike IR
-2. `pentesting/` — lab-safe methodology & reporting (no exploits)
-3. `soc-automation/` — Python + Go + PowerShell
-4. `edr-microsoft-defender/` — KQL + playbooks + detections
-5. `firewall-palo-alto-ngfw/` — ops runbooks + policy-as-code
-6. `cloud-security/` — Terraform AWS/Azure/GCP + CIS + scripts
-7. `splunk-soar/` — playbook designs + custom function stubs
-8. `application-security/` — SDLC, CI gates, STRIDE, OWASP
+1. `security-research/` — DEMO case studies (Entra illicit consent; multi-cloud toxic combination)
+2. `incident-response-siem/` — Splunk + CrowdStrike IR (+ DEMO hunt reports)
+3. `pentesting/` — lab-safe methodology & reporting (no exploits)
+4. `soc-automation/` — Python + Go + PowerShell
+5. `edr-microsoft-defender/` — KQL + playbooks + detections (+ DEMO hunt reports)
+6. `firewall-palo-alto-ngfw/` — ops runbooks + policy-as-code
+7. `cloud-security/` — Terraform AWS/Azure/GCP + CIS + scripts
+8. `splunk-soar/` — playbook designs + custom function stubs
+9. `application-security/` — SDLC, CI gates, STRIDE, OWASP
 
 ## Root files
 
@@ -51,6 +52,8 @@
 - `cloud-security/terraform/gcp/README.md`
 - `cloud-security/terraform/gcp/main.tf`
 - `edr-microsoft-defender/README.md`
+- `edr-microsoft-defender/hunt-reports/README.md`
+- `edr-microsoft-defender/hunt-reports/DEMO-2026-04-encoded-powershell-hunt.md`
 - `edr-microsoft-defender/detections/custom-detection-ideas.md`
 - `edr-microsoft-defender/detections/investigation-checklist.md`
 - `edr-microsoft-defender/kql/README.md`
@@ -70,6 +73,8 @@
 - `firewall-palo-alto-ngfw/runbooks/change-management.md`
 - `firewall-palo-alto-ngfw/runbooks/troubleshooting.md`
 - `incident-response-siem/README.md`
+- `incident-response-siem/hunt-reports/README.md`
+- `incident-response-siem/hunt-reports/DEMO-2026-03-dns-beacon-hunt.md`
 - `incident-response-siem/crowdstrike-runbooks/ioc-hunting.md`
 - `incident-response-siem/crowdstrike-runbooks/isolate-host.md`
 - `incident-response-siem/crowdstrike-runbooks/rtr-high-level.md`
@@ -94,6 +99,9 @@
 - `pentesting/methodology/scoping-checklist.md`
 - `pentesting/templates/pentest-report-template.md`
 - `pentesting/templates/rules-of-engagement.md`
+- `security-research/README.md`
+- `security-research/case-studies/DEMO-entra-illicit-consent-grant.md`
+- `security-research/case-studies/DEMO-multicloud-toxic-combination.md`
 - `scripts/build_go.sh`
 - `scripts/check_structure.sh`
 - `scripts/lint.sh`
@@ -123,11 +131,13 @@
 - `splunk-soar/playbooks/user_containment.yaml`
 - `splunk-soar/runbooks/soar-splunk-ticketing.md`
 
-**Total source/docs files (excl. venv/binary):** 96
+**Total source/docs files (excl. venv/binary):** 118
 
 ## Verification
 
+- `make check-structure` — required domains include `security-research`
 - `make test-python` / `scripts/test_python.sh` — pytest (6 passed)
 - `make build-go` / `scripts/build_go.sh` — `go build` succeeds
 - `make lint` / `scripts/lint.sh` — structure/syntax/gofmt guards
+- Terraform `fmt -check` + `init -backend=false` + `validate` for aws/azure/gcp
 
