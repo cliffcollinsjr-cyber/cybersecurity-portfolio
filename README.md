@@ -1,6 +1,6 @@
 # Cybersecurity Portfolio — Cliff Collins Jr
 
-Hiring-ready portfolio demonstrating **security engineering**, **SOC/IR**, **cloud security**, **EDR/SIEM**, **firewall operations**, **SOAR automation**, and **application security** skills.
+Hiring-ready portfolio demonstrating **security engineering**, **SOC/IR**, **threat hunting**, **security research** (identity/cloud attack paths), **cloud security**, **EDR/SIEM**, **firewall operations**, **SOAR automation**, and **application security** skills.
 
 > All content is **lab / DEMO / template** material. See [LAB-ETHICS.md](./LAB-ETHICS.md). No live production data. No offensive exploit code.
 
@@ -8,6 +8,7 @@ Hiring-ready portfolio demonstrating **security engineering**, **SOC/IR**, **clo
 
 | Domain / skill | Folder | Evidence (artifacts) |
 |----------------|--------|----------------------|
+| Security research (identity + cloud paths) | [`security-research/`](./security-research/) | DEMO case studies: Entra illicit consent; multi-cloud toxic combination (Wiz-style) |
 | Threat hunting (hypothesis-driven) | [`incident-response-siem/hunt-reports/`](./incident-response-siem/hunt-reports/) + [`edr-microsoft-defender/hunt-reports/`](./edr-microsoft-defender/hunt-reports/) | DEMO hunt reports: DNS beaconing (Splunk) + encoded PowerShell (Defender KQL) |
 | Incident response & SIEM (Splunk + CrowdStrike) | [`incident-response-siem/`](./incident-response-siem/) | Phishing/malware/host playbooks; SPL hunt queries; **DEMO threat hunt report**; Falcon isolate/RTR/IOC runbooks; incident timeline + case notes |
 | Authorized pentesting process & reporting | [`pentesting/`](./pentesting/) | Methodology, RoE/scoping templates, professional report template, lab notes structure, hardening recommendations (**no exploits**) |
@@ -45,6 +46,7 @@ cybersecurity-portfolio/
 ├── Makefile
 ├── .gitignore
 ├── scripts/
+├── security-research/
 ├── incident-response-siem/
 ├── pentesting/
 ├── soc-automation/
@@ -57,4 +59,4 @@ cybersecurity-portfolio/
 
 ## Attribution
 
-**Cliff Collins Jr** — cybersecurity portfolio for SOC analyst / security engineer / cloud security roles.
+**Cliff Collins Jr** — cybersecurity portfolio for SOC analyst / security engineer / cloud security / security research-adjacent roles.

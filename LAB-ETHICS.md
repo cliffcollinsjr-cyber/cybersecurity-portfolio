@@ -29,3 +29,7 @@
 ## Contact
 
 Portfolio attribution: **Cliff Collins Jr** — cybersecurity / SOC / cloud security candidate materials.
+
+## Security research case studies
+
+DEMO research notes under `security-research/` describe **misconfigurations and abuse of intended features** in owned lab environments. They do not include exploit code, phishing kits, or instructions for attacking third-party tenants.
