@@ -38,12 +38,12 @@ resource "azurerm_log_analytics_workspace" "demo" {
 }
 
 resource "azurerm_storage_account" "demo" {
-  name                     = "${var.prefix}sademo01"
-  resource_group_name      = azurerm_resource_group.demo.name
-  location                 = azurerm_resource_group.demo.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version          = "TLS1_2"
+  name                            = "${var.prefix}sademo01"
+  resource_group_name             = azurerm_resource_group.demo.name
+  location                        = azurerm_resource_group.demo.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
 
   blob_properties {
