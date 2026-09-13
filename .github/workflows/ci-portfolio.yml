@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Setup Go
-        uses: actions/setup-go@v5 # production: pin to commit SHA
+        uses: actions/setup-go@v7 # production: pin to commit SHA
         with:
           go-version: "1.22"
       - name: make lint
