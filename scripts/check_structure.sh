@@ -11,6 +11,7 @@ REQUIRED=(
   splunk-soar
   application-security
   security-research
+  iac-cicd-security
   LAB-ETHICS.md
   README.md
 )

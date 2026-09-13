@@ -1,4 +1,7 @@
 # [DEMO] GCP security baseline snippets
+# Remote state / locking / apply gates: see iac-cicd-security/terraform-repo-hardening.md
+# CI: terraform fmt -check + init -backend=false + validate (no cloud credentials).
+
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
@@ -25,20 +28,39 @@ provider "google" {
   region  = var.region
 }
 
+# Access-log sink for the primary security-logs bucket (CKV_GCP_62).
+# Cannot self-log (CKV_GCP_63) and cannot log elsewhere without a third bucket.
+resource "google_storage_bucket" "access_logs" {
+  # checkov:skip=CKV_GCP_62:Log-sink target cannot self-log (CKV_GCP_63); primary bucket is logged
+  name                        = "${var.project_id}-gcs-access-logs-demo"
+  location                    = var.region
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  versioning {
+    enabled = true
+  }
+  labels = {
+    label = "demo"
+  }
+}
+
 resource "google_storage_bucket" "logs" {
   name                        = "${var.project_id}-security-logs-demo"
   location                    = var.region
   uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
   versioning {
     enabled = true
   }
-  encryption {
-    default_kms_key_name = null # set to CMEK in real deployments
+  logging {
+    log_bucket        = google_storage_bucket.access_logs.name
+    log_object_prefix = "gcs-access/"
   }
   labels = {
     label = "demo"
   }
   # force_destroy intentionally omitted / false mindset for real data
+  # CMEK omitted in DEMO (no lab KMS key). Production: set default_kms_key_name.
 }
 
 resource "google_compute_firewall" "deny_all_ingress" {

@@ -1,0 +1,119 @@
+# Security gates: Terraform fmt/validate + IaC scan + PR dependency review + light SAST
+# [DEMO] No long-lived cloud credentials. terraform init uses -backend=false.
+# Production: pin every action to a full commit SHA (not a mutable tag).
+name: security-gates
+
+"on":
+  pull_request:
+  push:
+    branches: [main]
+
+# Workflow-level least privilege. Jobs that need more grant it locally.
+permissions:
+  contents: read
+
+concurrency:
+  group: security-gates-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  terraform-fmt-validate:
+    name: terraform-fmt-validate (${{ matrix.cloud }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        cloud: [aws, azure, gcp]
+    defaults:
+      run:
+        working-directory: cloud-security/terraform/${{ matrix.cloud }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # production: pin to commit SHA
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3 # production: pin to commit SHA
+        with:
+          terraform_wrapper: false
+      - name: terraform fmt -check
+        run: terraform fmt -check -diff
+        continue-on-error: false
+      - name: terraform init (no backend / no secrets)
+        run: terraform init -backend=false -input=false -no-color
+        continue-on-error: false
+      - name: terraform validate
+        run: terraform validate -no-color
+        continue-on-error: false
+
+  iac-checkov:
+    name: iac-checkov
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # production: pin to commit SHA
+      - name: Checkov Terraform scan
+        uses: bridgecrewio/checkov-action@v12 # production: pin to commit SHA
+        with:
+          directory: cloud-security/terraform
+          framework: terraform
+          config_file: .checkov.yml
+          soft_fail: false
+          compact: true
+        continue-on-error: false
+
+  iac-trivy:
+    name: iac-trivy-config
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # production: pin to commit SHA
+      - name: Trivy config / misconfig (fs)
+        uses: aquasecurity/trivy-action@v0.36.0 # production: pin to commit SHA
+        with:
+          scan-type: config
+          scan-ref: cloud-security/terraform
+          exit-code: "1"
+          severity: CRITICAL,HIGH
+          hide-progress: true
+        continue-on-error: false
+
+  dependency-review:
+    name: dependency-review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # production: pin to commit SHA
+      - name: Dependency review
+        uses: actions/dependency-review-action@v4 # production: pin to commit SHA
+        with:
+          fail-on-severity: high
+        continue-on-error: false
+
+  # App SAST is kept light here. Fuller Semgrep sample lives in
+  # application-security/ci/github-actions-security.yml (template, not this workflow).
+  sast-light:
+    name: sast-pip-audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # production: pin to commit SHA
+      - name: Setup Python
+        uses: actions/setup-python@v5 # production: pin to commit SHA
+        with:
+          python-version: "3.12"
+      - name: pip-audit (Python requirements)
+        run: |
+          python -m pip install --upgrade pip pip-audit
+          pip-audit -r soc-automation/python-alert-enrichment/requirements.txt
+        continue-on-error: false

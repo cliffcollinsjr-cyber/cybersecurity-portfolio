@@ -1,0 +1,38 @@
+# [DEMO] Checkov config for portfolio IaC gates.
+# Production orgs should start deny-by-default and waive only with ticketed risk acceptance.
+# Do not treat this file as a production exception register.
+
+compact: true
+framework:
+  - terraform
+directory:
+  - cloud-security/terraform
+soft-fail: false
+download-external-modules: false
+
+# Skips below are DEMO-scope only. Each is a known false-positive or an
+# intentionally omitted control (needs org-specific resources we do not invent).
+# Critical/High misconfigs in the modules themselves are fixed in Terraform,
+# not waived here.
+skip-check:
+  # AWS: cross-region replication is an org DR decision, not a DEMO log-bucket default.
+  - CKV_AWS_144
+  # AWS: S3 event notifications unused on archive/log buckets in this baseline.
+  - CKV2_AWS_62
+  # AWS: SecurityHub/CloudTrail/Config read APIs are not resource-ARN restrictable.
+  - CKV_AWS_356
+  # AWS: recommended CMK key policy grants account root kms:* (admin of this key only).
+  - CKV_AWS_109
+  - CKV_AWS_111
+  # Azure: private endpoint requires VNet, subnet, and Private DNS — out of DEMO scope.
+  - CKV2_AZURE_33
+  # Azure: disabling shared-key auth requires an Entra ID data-plane path not shown here.
+  - CKV2_AZURE_40
+  # Azure: CMK/Key Vault omitted; DEMO uses platform-managed keys + infrastructure encryption.
+  - CKV2_AZURE_1
+  # GCP: CMEK requires a lab KMS key ring/key we do not provision in this snippet.
+  - CKV_GCP_113
+
+# Inline-only skips (inside the resource block; Checkov requires start_line < comment < end_line):
+# - CKV_GCP_62 on google_storage_bucket.access_logs — sink cannot self-log (CKV_GCP_63)
+# - CKV_AZURE_33 on azurerm_storage_account.demo — queue logging is the 5.x sibling resource

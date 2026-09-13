@@ -1,0 +1,17 @@
+# [DEMO] CODEOWNERS — GitHub handle illustrates portfolio ownership.
+# Forks must replace @cliffcollinsjr-cyber with real maintainers.
+# Enable "Require review from Code Owners" on the protected default branch.
+
+* @cliffcollinsjr-cyber
+
+# Critical security / IaC / pipeline paths
+/.github/ @cliffcollinsjr-cyber
+/CODEOWNERS @cliffcollinsjr-cyber
+/LAB-ETHICS.md @cliffcollinsjr-cyber
+/.checkov.yml @cliffcollinsjr-cyber
+/.trivyignore @cliffcollinsjr-cyber
+/cloud-security/ @cliffcollinsjr-cyber
+/iac-cicd-security/ @cliffcollinsjr-cyber
+/application-security/ @cliffcollinsjr-cyber
+/scripts/ @cliffcollinsjr-cyber
+/Makefile @cliffcollinsjr-cyber

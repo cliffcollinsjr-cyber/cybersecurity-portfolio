@@ -4,7 +4,7 @@
 **Owner attribution:** Cliff Collins Jr  
 **Content class:** lab / DEMO / template only — see LAB-ETHICS.md
 
-## Domains delivered (9/9)
+## Domains delivered (10/10)
 
 1. `security-research/` — DEMO case studies (Entra illicit consent; multi-cloud toxic combination)
 2. `incident-response-siem/` — Splunk + CrowdStrike IR (+ DEMO hunt reports)
@@ -15,18 +15,36 @@
 7. `cloud-security/` — Terraform AWS/Azure/GCP + CIS + scripts
 8. `splunk-soar/` — playbook designs + custom function stubs
 9. `application-security/` — SDLC, CI gates, STRIDE, OWASP
+10. `iac-cicd-security/` — live GHA gates, OIDC patterns, pipeline/Terraform hardening
 
 ## Root files
 
 - `README.md` — skill-map table
 - `LAB-ETHICS.md`
+- `CODEOWNERS` — DEMO `@cliffcollinsjr-cyber`
 - `.gitignore`
+- `.checkov.yml` / `.trivyignore`
 - `Makefile`
 - `scripts/`
+- `.github/workflows/` — `security-gates.yml`, `ci-portfolio.yml`
+- `.github/dependabot.yml`
 - `BUILD_SUMMARY.md`
 
 ## Major files created
 
+- `.github/workflows/security-gates.yml`
+- `.github/workflows/ci-portfolio.yml`
+- `.github/dependabot.yml`
+- `.checkov.yml`
+- `.trivyignore`
+- `CODEOWNERS`
+- `iac-cicd-security/README.md`
+- `iac-cicd-security/oidc-cloud-deploy.md`
+- `iac-cicd-security/terraform-repo-hardening.md`
+- `iac-cicd-security/pipeline-hardening-checklist.md`
+- `iac-cicd-security/examples/README.md`
+- `iac-cicd-security/examples/github-oidc-aws-trust-policy.json`
+- `iac-cicd-security/examples/azure-federated-identity-notes.md`
 - `.gitignore`
 - `LAB-ETHICS.md`
 - `Makefile`
@@ -131,13 +149,15 @@
 - `splunk-soar/playbooks/user_containment.yaml`
 - `splunk-soar/runbooks/soar-splunk-ticketing.md`
 
-**Total source/docs files (excl. venv/binary):** 118
+**Total source/docs files (excl. venv/binary):** ~135
 
 ## Verification
 
-- `make check-structure` — required domains include `security-research`
+- `make check-structure` — required domains include `security-research` and `iac-cicd-security`
 - `make test-python` / `scripts/test_python.sh` — pytest (6 passed)
 - `make build-go` / `scripts/build_go.sh` — `go build` succeeds
 - `make lint` / `scripts/lint.sh` — structure/syntax/gofmt guards
 - Terraform `fmt -check` + `init -backend=false` + `validate` for aws/azure/gcp
+- Checkov on `cloud-security/terraform` — 81 passed, 0 failed, 2 inline skips (`CKV_GCP_62`, `CKV_AZURE_33`); see `.checkov.yml`
+- YAML parse of `.github/workflows/*.yml` and `.github/dependabot.yml`
 

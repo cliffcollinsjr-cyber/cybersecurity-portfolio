@@ -33,3 +33,8 @@ Portfolio attribution: **Cliff Collins Jr** — cybersecurity / SOC / cloud secu
 ## Security research case studies
 
 DEMO research notes under `security-research/` describe **misconfigurations and abuse of intended features** in owned lab environments. They do not include exploit code, phishing kits, or instructions for attacking third-party tenants.
+
+## IaC / CI examples
+
+OIDC trust policies, IAM roles, and Azure federated-credential snippets under `iac-cicd-security/` use **placeholder** account IDs, tenant IDs, subscription IDs, and repo names. They are not wired to a live cloud account. GitHub Actions in this repo run `terraform fmt` / `validate` / IaC scanners with **no cloud secrets** (`terraform init -backend=false`).
+

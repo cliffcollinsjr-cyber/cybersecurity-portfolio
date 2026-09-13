@@ -1,8 +1,10 @@
 # [DEMO] Sample GitHub Actions workflow — SAST + dependency scanning gates
+# TEMPLATE only — not the workflow GitHub runs in this repository.
+# Canonical running workflow: .github/workflows/security-gates.yml
 # Place as .github/workflows/security.yml in an application repo you maintain.
 name: security-gates-demo
 
-on:
+"on":
   pull_request:
   push:
     branches: [main]

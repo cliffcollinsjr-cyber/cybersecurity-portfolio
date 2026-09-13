@@ -1,6 +1,6 @@
 # Cybersecurity Portfolio — Cliff Collins Jr
 
-Hiring-ready portfolio demonstrating **security engineering**, **SOC/IR**, **threat hunting**, **security research** (identity/cloud attack paths), **cloud security**, **EDR/SIEM**, **firewall operations**, **SOAR automation**, and **application security** skills.
+Hiring-ready portfolio demonstrating **security engineering**, **SOC/IR**, **threat hunting**, **security research** (identity/cloud attack paths), **cloud security**, **IaC/CI/CD security**, **EDR/SIEM**, **firewall operations**, **SOAR automation**, and **application security** skills.
 
 > All content is **lab / DEMO / template** material. See [LAB-ETHICS.md](./LAB-ETHICS.md). No live production data. No offensive exploit code.
 
@@ -16,8 +16,9 @@ Hiring-ready portfolio demonstrating **security engineering**, **SOC/IR**, **thr
 | Microsoft Defender / EDR hunting | [`edr-microsoft-defender/`](./edr-microsoft-defender/) | KQL advanced hunting; **DEMO threat hunt report**; response playbooks; custom detection ideas + investigation checklist |
 | Palo Alto NGFW operations | [`firewall-palo-alto-ngfw/`](./firewall-palo-alto-ngfw/) | Change-mgmt runbook; zone/App-ID design; backup/upgrade checklists; troubleshooting; policy-as-code YAML |
 | Multi-cloud security baselines | [`cloud-security/`](./cloud-security/) | Terraform AWS/Azure/GCP baselines; CIS checklists; read-only review helpers; landing-zone notes |
+| IaC + CI/CD security | [`iac-cicd-security/`](./iac-cicd-security/) | Live GitHub Actions gates (fmt/validate/Checkov/Trivy); OIDC deploy patterns; pipeline + Terraform repo hardening; CODEOWNERS; Dependabot |
 | Splunk SOAR playbooks & integration | [`splunk-soar/`](./splunk-soar/) | Phishing/malware/containment playbook designs; safe Python stubs; SOAR↔Splunk↔ticketing runbook |
-| Application security / Secure SDLC | [`application-security/`](./application-security/) | Secure SDLC checklist; GitHub Actions SAST/deps gates; STRIDE worksheet; OWASP review notes |
+| Application security / Secure SDLC | [`application-security/`](./application-security/) | Secure SDLC checklist; GitHub Actions SAST/deps **template**; STRIDE worksheet; OWASP review notes |
 
 ## Quick start
 
@@ -28,6 +29,8 @@ make test-python   # run Python enrichment tests (creates venv if needed)
 make build-go      # build Go notifier CLI
 make lint          # lightweight checks
 ```
+
+Live CI (no secrets): [`.github/workflows/security-gates.yml`](./.github/workflows/security-gates.yml) and [`.github/workflows/ci-portfolio.yml`](./.github/workflows/ci-portfolio.yml).
 
 ## Design principles
 
@@ -43,8 +46,12 @@ cybersecurity-portfolio/
 ├── README.md                 # this file
 ├── LAB-ETHICS.md
 ├── BUILD_SUMMARY.md
+├── CODEOWNERS                # DEMO — @cliffcollinsjr-cyber
 ├── Makefile
 ├── .gitignore
+├── .checkov.yml
+├── .trivyignore
+├── .github/workflows/        # live security-gates + ci-portfolio
 ├── scripts/
 ├── security-research/
 ├── incident-response-siem/
@@ -53,6 +60,7 @@ cybersecurity-portfolio/
 ├── edr-microsoft-defender/
 ├── firewall-palo-alto-ngfw/
 ├── cloud-security/
+├── iac-cicd-security/
 ├── splunk-soar/
 └── application-security/
 ```

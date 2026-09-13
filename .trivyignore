@@ -1,0 +1,16 @@
+# [DEMO] Trivy misconfig ignores — aligned with .checkov.yml
+# Not a production waiver file. Each ID is DEMO-scope noise or a documented catch-22.
+
+# IAM Resource=* on SecurityHub/CloudTrail/Config read APIs (not resource-restrictable)
+# and the AWS-recommended CMK account-root admin statement.
+AVD-AWS-0057
+
+# S3 cross-region replication is an org DR decision, not a DEMO log-bucket default.
+AVD-AWS-0130
+
+# Azure: private endpoint / CMK / shared-key disable need org identity + network fabric.
+AVD-AZU-0013
+AVD-AZU-0040
+
+# GCP: CMEK omitted (no lab KMS key). Primary log bucket still has UBLA + public-access prevention.
+AVD-GCP-0066
