@@ -79,6 +79,16 @@ Authorization was implemented at the **route** level (“must be logged in”) b
 - [ ] Code review confirms query includes owner/tenant predicate (or equivalent policy engine decision).
 - [ ] Access denials appear in application logs with correlation id (no PII in log body beyond what policy allows).
 
+## Lessons / what I'd do differently
+
+`[DEMO]` assessment framing — practitioner notes on how I'd run the next review, not a claim about a production breach.
+
+- **Test object-level authZ before fancy scanners.** The interesting failure here was “logged in ⇒ allowed,” not a missing header. I'd put negative cross-tenant/export-id cases in the first hour of an authorized API review, alongside the happy path.
+- **Ask for the data-layer predicate in code review, not only a middleware diagram.** Route-level “must be authenticated” looks fine on a whiteboard and still ships BOLA. I'd require the `owner_id` / `tenant_id` filter (or equivalent policy decision) visible in the query or shared library.
+- **Prefer 404 over chatty 403 for cross-tenant misses** when product privacy allows — and still log denials with a correlation id for SOC. Severity narrative stays High either way if exports carry PII.
+- **Bake negative tests into CI before calling it remediated.** The verification checklist below is the bar I'd insist on; a one-off manual retest is too easy to skip on the next export-like endpoint.
+- **Defense in depth is not a substitute for authZ.** Short-lived signed URLs and audit logs help, but I'd still fail the finding until object ownership is enforced server-side.
+
 ## References (internal portfolio)
 
 - OWASP-aligned notes: [`../owasp-reviews/owasp-aligned-review-notes.md`](../owasp-reviews/owasp-aligned-review-notes.md)

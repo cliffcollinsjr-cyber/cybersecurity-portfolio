@@ -3,11 +3,18 @@
 [![ci-portfolio](https://github.com/cliffcollinsjr-cyber/cybersecurity-portfolio/actions/workflows/ci-portfolio.yml/badge.svg)](https://github.com/cliffcollinsjr-cyber/cybersecurity-portfolio/actions/workflows/ci-portfolio.yml)
 [![security-gates](https://github.com/cliffcollinsjr-cyber/cybersecurity-portfolio/actions/workflows/security-gates.yml/badge.svg)](https://github.com/cliffcollinsjr-cyber/cybersecurity-portfolio/actions/workflows/security-gates.yml)
 
+**Lab workbook** I own and keep CI-honest — not a brochure of fake production wins.
+Ethics in one line: synthetic `[DEMO]` entities; real methods (playbooks, queries, IaC, tests). Details: [LAB-ETHICS.md](./LAB-ETHICS.md).
+
+**Start here:** [PERSONAL-LAB.md](./PERSONAL-LAB.md) (what I actually ran/validated) · [RESUME-BULLETS.md](./RESUME-BULLETS.md) (paste-ready, lab-scoped)
+
+Actions **`ci-portfolio`** and **`security-gates`** are green on `main` (badges above).
+
 ## About
 
-I'm Cliff Collins Jr. This is the security work I'd walk someone through in an interview — hunts, IR writeups, AppSec findings, cloud/IaC controls, and a bit of automation you can run yourself. I'm looking at security engineering, SOC/IR, AppSec, and cloud or research-adjacent roles.
+I'm Cliff Collins Jr. This repo is the security work I'd walk through in an interview — hunts, IR writeups, AppSec findings, cloud/IaC controls, and automation you can run locally. I'm looking at security engineering, SOC/IR, AppSec, and cloud or research-adjacent roles.
 
-Everything here is lab / `[DEMO]` material, not production data or exploit kits. Ground rules: [LAB-ETHICS.md](./LAB-ETHICS.md).
+I built and validated this portfolio in mid-September 2026 (lint, tests, Terraform, Checkov, Actions). DEMO timelines and hostnames are placeholders so nothing pretends to be an employer incident. For the concrete checklist of what ran, see [PERSONAL-LAB.md](./PERSONAL-LAB.md).
 
 ## Skill map
 
@@ -25,6 +32,8 @@ Everything here is lab / `[DEMO]` material, not production data or exploit kits.
 | IaC + CI/CD security | [`iac-cicd-security/`](./iac-cicd-security/) | Live GitHub Actions gates (fmt/validate/Checkov/Trivy); OIDC deploy patterns; pipeline + Terraform repo hardening; CODEOWNERS; Dependabot |
 | Splunk SOAR playbooks & integration | [`splunk-soar/`](./splunk-soar/) | Phishing/malware/containment playbook designs; safe Python stubs; SOAR↔Splunk↔ticketing runbook |
 | Application security / Secure SDLC | [`application-security/`](./application-security/) | Secure SDLC checklist; GitHub Actions SAST/deps **template**; STRIDE worksheet; OWASP review notes; **DEMO finding** (IDOR on export API) |
+
+Lab log + resume bullets for this skill map: [PERSONAL-LAB.md](./PERSONAL-LAB.md) · [RESUME-BULLETS.md](./RESUME-BULLETS.md).
 
 ## Quick start
 
@@ -51,6 +60,8 @@ Live CI (no secrets): [`.github/workflows/security-gates.yml`](./.github/workflo
 ```
 cybersecurity-portfolio/
 ├── README.md                 # this file
+├── PERSONAL-LAB.md           # what was actually validated
+├── RESUME-BULLETS.md         # lab-scoped paste-ready bullets
 ├── LAB-ETHICS.md
 ├── BUILD_SUMMARY.md
 ├── CODEOWNERS                # DEMO — @cliffcollinsjr-cyber
@@ -75,4 +86,4 @@ cybersecurity-portfolio/
 
 ## Attribution
 
-**Cliff Collins Jr** — this portfolio backs conversations for security engineering, SOC/IR, AppSec, and cloud / research-adjacent roles. Lab and DEMO evidence only.
+**Cliff Collins Jr** — owned lab workbook for security engineering, SOC/IR, AppSec, and cloud / research-adjacent conversations. Synthetic DEMO entities; CI-tested methods. See [PERSONAL-LAB.md](./PERSONAL-LAB.md).

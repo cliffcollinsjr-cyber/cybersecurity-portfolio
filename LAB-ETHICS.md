@@ -1,21 +1,35 @@
 # Lab Ethics & Authorized Use
 
 **Owner:** Cliff Collins Jr  
-**Purpose:** Hiring portfolio demonstrating cybersecurity engineering skills using **authorized lab, demo, and sample data only**.
+**Purpose:** Owned lab workbook / hiring portfolio. Engineering practices here are
+intentional portfolio work; incident entities and telemetry labeled `[DEMO]` are
+**synthetic**.
+
+**Quick read:** [PERSONAL-LAB.md](./PERSONAL-LAB.md) (what was actually validated) ·
+[RESUME-BULLETS.md](./RESUME-BULLETS.md) (paste-ready, lab-scoped bullets).
+
+## Clarification: DEMO vs. the craft
+
+| | |
+|--|--|
+| **`[DEMO]`** | Synthetic data and entities (hosts, users, domains, hashes, timelines, ticket IDs). Not production telemetry, not real employer/customer incidents, not fake CVEs. |
+| **Engineering practices** | Playbooks, SPL/KQL, Terraform baselines, detection YAML + tests, SOAR designs, CI gates, AppSec/IR write-up *structure* — intentional work by Cliff building and validating this repo. |
+
+Judge process and remediations; treat DEMO names as placeholders.
 
 ## Non-negotiable rules
 
-1. **Authorized environments only** — All techniques, queries, scripts, and playbooks in this repository are intended for systems you own, operate under written authorization, or use in sanctioned training labs (e.g., vendor sandboxes, CTF platforms with explicit rules, employer-provided ranges).
+1. **Authorized environments only** — Techniques, queries, scripts, and playbooks are intended for systems you own, operate under written authorization, or use in sanctioned training labs (vendor sandboxes, CTF platforms with explicit rules, employer-provided ranges).
 2. **Demo / sample data only** — Every incident timeline, IOC list, alert sample, and metric in this repo is **fictional or anonymized DEMO data**. Nothing here represents live production telemetry, real customer incidents, or real credentials.
-3. **No offensive weaponization** — This portfolio intentionally excludes exploit code, weaponized payloads, credential-dumping tooling, and attack step-by-step instructions against systems. Pentesting materials cover **methodology, scoping, reporting, and remediation** only.
-4. **Least privilege & auditability** — Automation and scripts are designed as read-heavy triage helpers with documented permission requirements. Destructive or containment actions are described as high-level runbook steps requiring human approval gates.
-5. **Responsible disclosure mindset** — Findings discovered in authorized assessments should be reported through agreed channels with clear severity, evidence, and remediations — never shared publicly without permission.
+3. **No offensive weaponization** — Excludes exploit code, weaponized payloads, credential-dumping tooling, and attack step-by-step instructions against systems. Pentesting materials cover **methodology, scoping, reporting, and remediation** only.
+4. **Least privilege & auditability** — Automation and scripts are read-heavy triage helpers with documented permission requirements. Destructive or containment actions are high-level runbook steps with human approval gates.
+5. **Responsible disclosure mindset** — Findings from authorized assessments go through agreed channels with severity, evidence, and remediations — never shared publicly without permission.
 
 ## Labeling convention
 
 | Label | Meaning |
 |-------|---------|
-| `[DEMO]` | Fictional sample data for illustration |
+| `[DEMO]` | Synthetic sample data / entities for illustration |
 | `[TEMPLATE]` | Fill-in document for real authorized work |
 | `[LAB]` | Safe for controlled lab use only |
 | `[READ-ONLY]` | Query/script intended not to mutate state |

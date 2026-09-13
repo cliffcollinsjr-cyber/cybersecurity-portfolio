@@ -94,12 +94,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4 # production: pin to commit SHA
       # Requires Dependency graph: Settings → Code security → Dependency graph.
-      # Until enabled, soft-fail so other gates still protect main.
+      # Graph is enabled; enforce on PRs (main runs already succeeded).
       - name: Dependency review
         uses: actions/dependency-review-action@v4 # production: pin to commit SHA
         with:
           fail-on-severity: high
-        continue-on-error: true
+        continue-on-error: false
 
   # App SAST is kept light here. Fuller Semgrep sample lives in
   # application-security/ci/github-actions-security.yml (template, not this workflow).

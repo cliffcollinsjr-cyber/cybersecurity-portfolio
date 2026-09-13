@@ -95,6 +95,16 @@ Related host playbook: [`../playbooks/compromised-host.md`](../playbooks/comprom
 3. Second-stage attachment arrived **after** password reset — identity containment ≠ host containment; run both tracks in parallel.
 4. Users who report *late* still unlock campaign scope (mailbox search) — keep reporting friction low.
 
+### Lessons / what I'd do differently
+
+Still a `[DEMO]` narrative — reflecting on the process I'd tighten next time, not claiming a live tenant win.
+
+- **Open identity and host tracks together.** I sequenced password reset before host isolation in the first draft timeline; in a real case I'd push both in parallel as soon as click + encoded PowerShell lined up, and document the approval gates explicitly so nobody waits on the other track.
+- **Widen the auth join, then prove it.** Thirty minutes caught this story; I'd also run a 60–90m window and measure noise before promoting the SPL. Slow MFA and deferred “invoice” opens are exactly where short joins go blind.
+- **Treat MFA-satisfied risk as a first-class signal.** Lab “fatigue / approval” was convenient for the plot; operationally I'd want risk-based Conditional Access or CAE-style session invalidation in the playbook, not only a password reset checkbox.
+- **Pre-stage mailbox campaign search.** Sibling recipients with zero clicks still matter for scope. I'd keep the SOAR/ticketing stub's campaign-ID search as a mandatory early step, not a nice-to-have after isolation.
+- **Detection follow-ups as tickets, not footnotes.** The SPL / KQL / detection-as-code links below are the durable value of the case. Next time I'd file them as numbered follow-ups with owners before closing, even in lab.
+
 ## 9. Detection follow-ups
 
 | Follow-up | Link / artifact | Owner idea |

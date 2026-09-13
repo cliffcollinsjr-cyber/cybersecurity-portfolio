@@ -6,7 +6,11 @@
 
 ## Recent additions (2026-09)
 
-- Root README **About** + GitHub Actions badges (`ci-portfolio`, `security-gates`)
+- Owned-lab workbook: `PERSONAL-LAB.md` (what was actually validated) + `RESUME-BULLETS.md` (lab-scoped paste bullets)
+- Root README tightened to lab voice; links to PERSONAL-LAB / RESUME-BULLETS; Actions green on `main`
+- `LAB-ETHICS.md` clarification: DEMO = synthetic entities; engineering practices are intentional portfolio work
+- Practitioner **Lessons / what I'd do differently** on DEMO IR case + AppSec IDOR finding
+- `security-gates` dependency-review: `continue-on-error: false` (dependency graph enabled)
 - AppSec DEMO finding: `application-security/findings/DEMO-2026-06-idor-export-api.md`
 - Full IR case: `incident-response-siem/cases/DEMO-IR-2026-07-phishing-to-host.md`
 - Detection-as-code lite: `detection-as-code/` (YAML + fixture + `make test-dac`)
@@ -27,8 +31,10 @@
 
 ## Root files
 
-- `README.md` — skill-map table
-- `LAB-ETHICS.md`
+- `README.md` — skill-map table + links to lab log / resume bullets
+- `PERSONAL-LAB.md` — mid-Sep 2026 validation log (owned lab)
+- `RESUME-BULLETS.md` — first-person, lab-scoped resume lines
+- `LAB-ETHICS.md` — DEMO vs. craft clarification
 - `CODEOWNERS` — DEMO `@cliffcollinsjr-cyber`
 - `.gitignore`
 - `.checkov.yml` / `.trivyignore`
@@ -181,4 +187,4 @@
 - Terraform `fmt -check` + `init -backend=false` + `validate` for aws/azure/gcp
 - Checkov on `cloud-security/terraform` — 81 passed, 0 failed, 2 inline skips (`CKV_GCP_62`, `CKV_AZURE_33`); see `.checkov.yml`
 - YAML parse of `.github/workflows/*.yml` and `.github/dependabot.yml`
-
+- See `PERSONAL-LAB.md` for the human validation log; `RESUME-BULLETS.md` for skill-map-aligned bullets
