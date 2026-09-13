@@ -8,10 +8,11 @@ Hiring-ready portfolio demonstrating **security engineering**, **SOC/IR**, **clo
 
 | Domain / skill | Folder | Evidence (artifacts) |
 |----------------|--------|----------------------|
-| Incident response & SIEM (Splunk + CrowdStrike) | [`incident-response-siem/`](./incident-response-siem/) | Phishing/malware/host playbooks; SPL hunt queries; Falcon isolate/RTR/IOC runbooks; DEMO incident timeline + case notes |
+| Threat hunting (hypothesis-driven) | [`incident-response-siem/hunt-reports/`](./incident-response-siem/hunt-reports/) + [`edr-microsoft-defender/hunt-reports/`](./edr-microsoft-defender/hunt-reports/) | DEMO hunt reports: DNS beaconing (Splunk) + encoded PowerShell (Defender KQL) |
+| Incident response & SIEM (Splunk + CrowdStrike) | [`incident-response-siem/`](./incident-response-siem/) | Phishing/malware/host playbooks; SPL hunt queries; **DEMO threat hunt report**; Falcon isolate/RTR/IOC runbooks; incident timeline + case notes |
 | Authorized pentesting process & reporting | [`pentesting/`](./pentesting/) | Methodology, RoE/scoping templates, professional report template, lab notes structure, hardening recommendations (**no exploits**) |
 | SOC automation (Python, Go, PowerShell) | [`soc-automation/`](./soc-automation/) | Python alert enrichment + tests; Go CLI notifier; Defender/M365 helper scripts; Mermaid architecture |
-| Microsoft Defender / EDR hunting | [`edr-microsoft-defender/`](./edr-microsoft-defender/) | KQL advanced hunting; response playbooks; custom detection ideas + investigation checklist |
+| Microsoft Defender / EDR hunting | [`edr-microsoft-defender/`](./edr-microsoft-defender/) | KQL advanced hunting; **DEMO threat hunt report**; response playbooks; custom detection ideas + investigation checklist |
 | Palo Alto NGFW operations | [`firewall-palo-alto-ngfw/`](./firewall-palo-alto-ngfw/) | Change-mgmt runbook; zone/App-ID design; backup/upgrade checklists; troubleshooting; policy-as-code YAML |
 | Multi-cloud security baselines | [`cloud-security/`](./cloud-security/) | Terraform AWS/Azure/GCP baselines; CIS checklists; read-only review helpers; landing-zone notes |
 | Splunk SOAR playbooks & integration | [`splunk-soar/`](./splunk-soar/) | Phishing/malware/containment playbook designs; safe Python stubs; SOAR↔Splunk↔ticketing runbook |
