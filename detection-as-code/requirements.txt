@@ -1,2 +1,8 @@
 pytest>=8.0.0
 PyYAML>=6.0
+# Sigma toolchain used by tests/test_sigma_rules.py (conversion + rule parsing).
+# Pinned to the versions the SPL snapshot was generated with; bump together and
+# regenerate sigma/expected/*.spl when upgrading.
+pySigma==1.5.1
+pysigma-backend-splunk==2.1.0
+pysigma-pipeline-sysmon==2.0.0

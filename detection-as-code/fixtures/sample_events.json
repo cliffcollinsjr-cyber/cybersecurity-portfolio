@@ -1,42 +1,324 @@
 {
   "label": "[DEMO]",
-  "description": "Synthetic process events for detection-as-code unit tests",
+  "description": "Synthetic Sysmon EventID 1 (process creation) events for detection-as-code tests. Field names follow Sysmon (Image, OriginalFileName, CommandLine, ParentImage). Base64 payloads decode to harmless cmdlets (Get-Date, Write-Output, ...).",
+  "schema": {
+    "label": "malicious|benign",
+    "expected_rules": "rule ids that must fire (Sigma UUID / DET-* id); empty for benign",
+    "legacy": "true for the four original fixtures"
+  },
   "events": [
     {
       "event_id": "EVT-DEMO-001",
-      "host": "lab-win10-19",
-      "user": "jordan.lee",
-      "process_name": "powershell.exe",
-      "command_line": "powershell.exe -NoProfile -EncodedCommand UwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwA=",
-      "parent_process": "WINWORD.EXE",
-      "should_match": true
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "Full -EncodedCommand from an Office parent (original fixture)",
+      "legacy": true,
+      "EventID": 1,
+      "Computer": "lab-win10-19",
+      "User": "LAB\\jordan.lee",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -NoProfile -EncodedCommand UwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwA=",
+      "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE"
     },
     {
       "event_id": "EVT-DEMO-002",
-      "host": "lab-win10-07",
-      "user": "alex.rivera",
-      "process_name": "pwsh.exe",
-      "command_line": "pwsh.exe -enc RQBjAGgAbwAgACcARABlAG0AbwAnAA==",
-      "parent_process": "explorer.exe",
-      "should_match": true
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "pwsh with -enc (original fixture)",
+      "legacy": true,
+      "EventID": 1,
+      "Computer": "lab-win10-07",
+      "User": "LAB\\alex.rivera",
+      "Image": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "OriginalFileName": "pwsh.dll",
+      "CommandLine": "pwsh.exe -enc RQBjAGgAbwAgACcARABlAG0AbwAnAA==",
+      "ParentImage": "C:\\Windows\\explorer.exe"
     },
     {
       "event_id": "EVT-DEMO-003",
-      "host": "lab-win10-03",
-      "user": "sam.nguyen",
-      "process_name": "powershell.exe",
-      "command_line": "powershell.exe -NoProfile -File C:\\Scripts\\backup.ps1",
-      "parent_process": "services.exe",
-      "should_match": false
+      "label": "benign",
+      "expected_rules": [],
+      "description": "Script run by -File (original fixture)",
+      "legacy": true,
+      "EventID": 1,
+      "Computer": "lab-win10-03",
+      "User": "LAB\\sam.nguyen",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -NoProfile -File C:\\Scripts\\backup.ps1",
+      "ParentImage": "C:\\Windows\\System32\\services.exe"
     },
     {
       "event_id": "EVT-DEMO-004",
-      "host": "lab-win10-11",
-      "user": "ops.bot",
-      "process_name": "cmd.exe",
-      "command_line": "cmd.exe /c echo hello",
-      "parent_process": "explorer.exe",
-      "should_match": false
+      "label": "benign",
+      "expected_rules": [],
+      "description": "cmd.exe echo (original fixture)",
+      "legacy": true,
+      "EventID": 1,
+      "Computer": "lab-win10-11",
+      "User": "LAB\\ops.bot",
+      "Image": "C:\\Windows\\System32\\cmd.exe",
+      "OriginalFileName": "Cmd.Exe",
+      "CommandLine": "cmd.exe /c echo hello",
+      "ParentImage": "C:\\Windows\\explorer.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-005",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "Shortest prefix -e (evasion of *-enc*)",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-19",
+      "User": "LAB\\jordan.lee",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -e RwBlAHQALQBEAGEAdABlAA==",
+      "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE"
+    },
+    {
+      "event_id": "EVT-DEMO-006",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "-ec alias with hidden window",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-07",
+      "User": "LAB\\alex.rivera",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell -NoP -W Hidden -ec VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAnAHQAcgBpAHAAdwBpAHIAZQAtAGQAZQBtAG8AJwA=",
+      "ParentImage": "C:\\Windows\\System32\\wscript.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-007",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "Slash switch introducer /enc",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-03",
+      "User": "LAB\\sam.nguyen",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" /enc UwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgAG4AbwB0AGUAcABhAGQALgBlAHgAZQA=",
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-008",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "Mid-length prefix -EncodedC",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-11",
+      "User": "LAB\\ops.bot",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -NonInteractive -EncodedC RwBlAHQALQBQAHIAbwBjAGUAcwBzACAAfAAgAFMAZQBsAGUAYwB0AC0ATwBiAGoAZQBjAHQAIAAtAEYAaQByAHMAdAAgADEA",
+      "ParentImage": "C:\\Windows\\System32\\mshta.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-009",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "Renamed powershell.exe (OriginalFileName only)",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-19",
+      "User": "LAB\\jordan.lee",
+      "Image": "C:\\Users\\Public\\svchost32.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "svchost32.exe -nop -enc VwByAGkAdABlAC0ASABvAHMAdAAgACcAcgBlAG4AYQBtAGUAZAAgAGgAbwBzAHQAIABkAGUAbQBvACcA",
+      "ParentImage": "C:\\Windows\\System32\\rundll32.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-010",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "pwsh 7, mixed-case full switch, quoted argument",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-07",
+      "User": "LAB\\alex.rivera",
+      "Image": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "OriginalFileName": "pwsh.dll",
+      "CommandLine": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoLogo -EnCoDeDcOmMaNd \"VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAnAHQAcgBpAHAAdwBpAHIAZQAtAGQAZQBtAG8AJwA=\"",
+      "ParentImage": "C:\\Windows\\explorer.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-011",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "En dash (U+2013) switch introducer",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-03",
+      "User": "LAB\\sam.nguyen",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe –enc RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAEMAOgBcAFQAZQBtAHAA",
+      "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE"
+    },
+    {
+      "event_id": "EVT-DEMO-012",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "pwsh 7 GNU-style double dash --encodedcommand",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-11",
+      "User": "LAB\\ops.bot",
+      "Image": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "OriginalFileName": "pwsh.dll",
+      "CommandLine": "pwsh --encodedcommand RwBlAHQALQBEAGEAdABlAA==",
+      "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-013",
+      "label": "malicious",
+      "expected_rules": [
+        "bb2386f8-201e-4542-9f98-16d53b45f2e8",
+        "DET-DEFENDER-DEMO-001"
+      ],
+      "description": "Renamed pwsh (OriginalFileName pwsh.dll)",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-19",
+      "User": "LAB\\jordan.lee",
+      "Image": "C:\\ProgramData\\updater\\upd.exe",
+      "OriginalFileName": "pwsh.dll",
+      "CommandLine": "upd.exe -en UwB0AGEAcgB0AC0AUAByAG8AYwBlAHMAcwAgAG4AbwB0AGUAcABhAGQALgBlAHgAZQA=",
+      "ParentImage": "C:\\Windows\\System32\\svchost.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-020",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "-Encoding UTF8 cmdlet parameter (old *-enc* FP)",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-03",
+      "User": "LAB\\sam.nguyen",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -NoProfile -Command Get-Content C:\\Logs\\app.log -Encoding UTF8 | Select-Object -First 5",
+      "ParentImage": "C:\\Windows\\explorer.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-021",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "Script path with a folder named '-enc' after a space",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-11",
+      "User": "LAB\\ops.bot",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -NoProfile -File \"C:\\Ops\\Nightly -enc job\\run.ps1\"",
+      "ParentImage": "C:\\Windows\\System32\\svchost.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-022",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "Script path containing \\-encrypt (old *-enc* FP)",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-11",
+      "User": "LAB\\ops.bot",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -File C:\\Tools\\-encrypt-backup.ps1",
+      "ParentImage": "C:\\Windows\\System32\\svchost.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-023",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "-ExecutionPolicy Bypass -File with 'enc' in the file name",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-03",
+      "User": "LAB\\sam.nguyen",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -ExecutionPolicy Bypass -File C:\\Scripts\\encrypt_backup.ps1",
+      "ParentImage": "C:\\Windows\\System32\\svchost.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-024",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "-ep alias for ExecutionPolicy",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-07",
+      "User": "LAB\\alex.rivera",
+      "Image": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "OriginalFileName": "pwsh.dll",
+      "CommandLine": "pwsh.exe -ep Bypass -WindowStyle Hidden -File C:\\Scripts\\inventory.ps1",
+      "ParentImage": "C:\\Windows\\System32\\svchost.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-025",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "-e with a Base64-looking argument in a non-PowerShell process",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-07",
+      "User": "LAB\\alex.rivera",
+      "Image": "C:\\Windows\\System32\\wsl.exe",
+      "OriginalFileName": "wsl.exe",
+      "CommandLine": "wsl.exe -e /usr/local/bin/logrotate --force",
+      "ParentImage": "C:\\Windows\\explorer.exe"
+    },
+    {
+      "event_id": "EVT-DEMO-026",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "Abbreviated cmdlet parameter '-en Unicode' inside -Command text",
+      "legacy": false,
+      "EventID": 1,
+      "Computer": "lab-win10-19",
+      "User": "LAB\\jordan.lee",
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "OriginalFileName": "PowerShell.EXE",
+      "CommandLine": "powershell.exe -c Get-Process | Out-File C:\\Temp\\procs.txt -en Unicode",
+      "ParentImage": "C:\\Windows\\explorer.exe"
     }
   ]
 }

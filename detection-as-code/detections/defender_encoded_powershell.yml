@@ -1,4 +1,9 @@
 # [DEMO] Microsoft Defender / Advanced Hunting style detection definition
+# 2026-10-17: KQL tightened to the same logic as the Sigma rule
+# sigma/proc_creation_win_powershell_encoded_command.yml (bb2386f8-...). The regex
+# below must stay identical to the Sigma `CommandLine|re` value; tests enforce it.
+# Old `has_any ("-enc", "-EncodedCommand")` missed -e/-ec/-en/-EncodedC//enc and
+# renamed binaries.
 id: DET-DEFENDER-DEMO-001
 title: Encoded PowerShell on device
 platform: microsoft_defender
@@ -6,20 +11,29 @@ status: experimental
 severity: high
 mitre:
   - T1059.001
+  - T1027.010
+related_sigma: bb2386f8-201e-4542-9f98-16d53b45f2e8
 description: >
-  KQL-oriented detection idea for DeviceProcessEvents showing encoded
-  PowerShell. Pair with investigation checklist before response actions.
+  KQL detection for DeviceProcessEvents showing PowerShell (by FileName or, for
+  renamed copies, by ProcessVersionInfoOriginalFileName) started with any accepted
+  form of -EncodedCommand (-e, -ec, -en ... -EncodedCommand; -, --, /, or Unicode
+  dash) followed by a Base64 argument. Pair with investigation checklist before
+  response actions.
 kql: |
   DeviceProcessEvents
   | where Timestamp > ago(1d)
   | where FileName in~ ("powershell.exe", "pwsh.exe")
-  | where ProcessCommandLine has_any ("-enc", "-EncodedCommand")
-  | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+      or ProcessVersionInfoOriginalFileName in~ ("PowerShell.EXE", "pwsh.dll")
+  | where ProcessCommandLine matches regex @"(?i)(?:^|\s)(?:--?|/|––?|——?|――?)(?:e|ec|en|enc|enco|encod|encode|encoded|encodedc|encodedco|encodedcom|encodedcomm|encodedcomma|encodedcomman|encodedcommand)\s+[""']?[a-z0-9+/]{16,}={0,2}"
+  | project Timestamp, DeviceName, AccountName, FileName, ProcessVersionInfoOriginalFileName, ProcessCommandLine, InitiatingProcessFileName
+# Legacy keyword smoke list (used only by test_fixture_events_match_keywords on the
+# four original fixtures); the KQL above is the detection logic.
 condition_keywords:
   - powershell
   - -enc
   - -EncodedCommand
 false_positives:
-  - Packaged software installers that wrap encoded scripts (validate publisher)
+  - Packaged software installers / management agents that wrap encoded scripts (validate publisher, allowlist by InitiatingProcess + signer)
 references:
   - edr-microsoft-defender/kql/suspicious_powershell.kql
+  - detection-as-code/sigma/proc_creation_win_powershell_encoded_command.yml

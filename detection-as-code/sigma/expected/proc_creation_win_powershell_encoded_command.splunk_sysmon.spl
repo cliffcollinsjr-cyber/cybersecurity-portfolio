@@ -1,0 +1,2 @@
+EventID=1 Image IN ("*\\powershell.exe", "*\\pwsh.exe") OR OriginalFileName IN ("PowerShell.EXE", "pwsh.dll")
+| regex CommandLine="(?i)(?:^|\\s)(?:--?|/|––?|——?|――?)(?:e|ec|en|enc|enco|encod|encode|encoded|encodedc|encodedco|encodedcom|encodedcomm|encodedcomma|encodedcomman|encodedcommand)\\s+[\"']?[a-z0-9+/]{16,}={0,2}"
