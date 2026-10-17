@@ -80,6 +80,7 @@ jobs:
           exit-code: "1"
           severity: CRITICAL,HIGH
           hide-progress: true
+          trivyignores: .trivyignore
         continue-on-error: false
 
   dependency-review:
@@ -92,6 +93,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4 # production: pin to commit SHA
+      # Requires Dependency graph: Settings → Code security → Dependency graph.
+      # Graph is enabled; enforce on PRs (main runs already succeeded).
       - name: Dependency review
         uses: actions/dependency-review-action@v4 # production: pin to commit SHA
         with:
