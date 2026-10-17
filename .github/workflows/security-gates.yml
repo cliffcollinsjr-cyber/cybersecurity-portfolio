@@ -33,7 +33,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4 # production: pin to commit SHA
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3 # production: pin to commit SHA
+        uses: hashicorp/setup-terraform@v4 # production: pin to commit SHA
         with:
           terraform_wrapper: false
       - name: terraform fmt -check
