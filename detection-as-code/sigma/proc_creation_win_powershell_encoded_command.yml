@@ -1,0 +1,46 @@
+title: PowerShell Launched With Encoded Command Switch
+id: bb2386f8-201e-4542-9f98-16d53b45f2e8
+status: experimental
+description: |
+    Detects powershell.exe / pwsh.exe (including renamed copies, via OriginalFileName) started
+    with the -EncodedCommand switch in any form the PowerShell command-line parser accepts:
+    every prefix from -e up to -EncodedCommand plus the -ec alias, introduced by '-', '--',
+    '/', en dash, em dash or horizontal bar, followed by a Base64-looking argument.
+    It deliberately does not match -Encoding, -ExecutionPolicy/-ep, -EncodedArguments or
+    file paths that merely contain "-enc". Supersedes DET-SPLUNK-DEMO-001. [DEMO] lab rule.
+references:
+    - https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh
+    - https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe
+    - https://github.com/PowerShell/PowerShell/blob/master/src/Microsoft.PowerShell.ConsoleHost/host/msh/CommandLineParameterParser.cs
+    - https://attack.mitre.org/techniques/T1059/001/
+    - https://attack.mitre.org/techniques/T1027/010/
+author: Cliff Collins Jr
+date: 2026-10-17
+tags:
+    - attack.execution
+    - attack.t1059.001
+    - attack.stealth  # TA0005, formerly "Defense Evasion" (renamed in current ATT&CK)
+    - attack.t1027
+    - attack.t1027.010
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    # The binary is PowerShell, by path or by PE metadata (catches renamed copies).
+    selection_proc_image:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+    selection_proc_ofn:
+        OriginalFileName:
+            - 'PowerShell.EXE'
+            - 'pwsh.dll'
+    # Whitespace, a switch introducer (- -- / and the Unicode dashes PowerShell accepts),
+    # an unambiguous prefix of "encodedcommand" (or the "ec" alias), whitespace, Base64.
+    selection_cli:
+        CommandLine|re: '(?i)(?:^|\s)(?:--?|/|––?|——?|――?)(?:e|ec|en|enc|enco|encod|encode|encoded|encodedc|encodedco|encodedcom|encodedcomm|encodedcomma|encodedcomman|encodedcommand)\s+["'']?[a-z0-9+/]{16,}={0,2}'
+    condition: 1 of selection_proc_* and selection_cli
+falsepositives:
+    - Management and deployment agents (SCCM/Intune, RMM tools, some installers) that launch PowerShell with -EncodedCommand; allowlist by ParentImage plus signer/hash, not by command line alone
+    - Script text passed via -Command that contains a cmdlet parameter abbreviated to -e/-en followed by a 16+ character alphanumeric value (for example "Out-File -en BigEndianUnicode")
+level: high

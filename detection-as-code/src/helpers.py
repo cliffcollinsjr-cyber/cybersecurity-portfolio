@@ -11,6 +11,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 DETECTIONS_DIR = ROOT / "detections"
 FIXTURES_DIR = ROOT / "fixtures"
+SIGMA_DIR = ROOT / "sigma"
 
 
 def load_detection(name: str) -> dict[str, Any]:
@@ -33,8 +34,9 @@ def load_fixture(name: str = "sample_events.json") -> dict[str, Any]:
 
 def event_matches_keywords(command_line: str, keywords: list[str]) -> bool:
     """
-    Return True if the command line looks like encoded PowerShell abuse
-    for our DEMO detections: must mention powershell/pwsh AND an encode switch.
+    LEGACY keyword smoke check (substring match on the command line). Kept for
+    the original four fixtures only; it is NOT the detection logic. The real
+    logic is the Sigma rule in sigma/, evaluated by src/sigma_eval.py.
     """
     cl = (command_line or "").lower()
     kw = [k.lower() for k in keywords]

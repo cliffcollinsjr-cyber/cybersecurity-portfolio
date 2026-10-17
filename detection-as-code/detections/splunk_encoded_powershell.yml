@@ -1,20 +1,28 @@
 # [DEMO] Splunk-style detection definition (portfolio / detection-as-code lite)
+# SUPERSEDED 2026-10-17 by the Sigma rule
+#   sigma/proc_creation_win_powershell_encoded_command.yml (id bb2386f8-201e-4542-9f98-16d53b45f2e8)
+# The hand-written search that used to live here filtered on process_name and
+# CommandLine="*-enc*": it never matched Sysmon data (no process_name field), never
+# matched the fixtures (which used command_line), fired on -Encoding / paths with
+# "-enc", and missed -e/-ec/-en/-EncodedC//enc and renamed binaries.
+# `search` below is now GENERATED: sigma convert -t splunk -p sysmon <rule>
+# (identical to sigma/expected/*.splunk_sysmon.spl; tests enforce it). Do not edit
+# by hand; prepend your index/source, e.g. index=sysmon.
 id: DET-SPLUNK-DEMO-001
 title: Encoded PowerShell command line
 platform: splunk
-status: experimental
+status: deprecated
+superseded_by: bb2386f8-201e-4542-9f98-16d53b45f2e8
 severity: high
 mitre:
   - T1059.001
 description: >
-  Flags process events where PowerShell is invoked with encoded command
-  switches. Lab indexes only — tune allowlists before any production use.
+  Superseded by the Sigma rule above; kept so existing references resolve. The
+  search is the Sigma rule converted for Splunk with the sysmon pipeline (Sysmon
+  EventID 1 field names: Image, OriginalFileName, CommandLine).
 search: |
-  index=edr sourcetype=process
-  (process_name="powershell.exe" OR process_name="pwsh.exe")
-  (CommandLine="*-enc*" OR CommandLine="*-EncodedCommand*")
-  | stats count earliest(_time) as first_seen latest(_time) as last_seen by host, user, CommandLine
-  | where count > 0
+  EventID=1 Image IN ("*\\powershell.exe", "*\\pwsh.exe") OR OriginalFileName IN ("PowerShell.EXE", "pwsh.dll")
+  | regex CommandLine="(?i)(?:^|\\s)(?:--?|/|––?|——?|――?)(?:e|ec|en|enc|enco|encod|encode|encoded|encodedc|encodedco|encodedcom|encodedcomm|encodedcomma|encodedcomman|encodedcommand)\\s+[\"']?[a-z0-9+/]{16,}={0,2}"
 condition_keywords:
   - powershell
   - -enc
@@ -22,4 +30,5 @@ condition_keywords:
 false_positives:
   - Signed enterprise automation that intentionally uses encoded commands (allowlist by parent + hash)
 references:
-  - ../edr parity: edr-microsoft-defender/kql/suspicious_powershell.kql
+  - detection-as-code/sigma/proc_creation_win_powershell_encoded_command.yml
+  - edr-microsoft-defender/kql/suspicious_powershell.kql

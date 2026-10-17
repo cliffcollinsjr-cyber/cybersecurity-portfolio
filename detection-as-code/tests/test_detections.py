@@ -1,4 +1,8 @@
-"""Unit tests for detection-as-code lite — [DEMO] fixtures only."""
+"""Unit tests for detection-as-code lite — [DEMO] fixtures only.
+
+The keyword checks here are legacy smoke tests for the original four fixtures.
+Real rule logic is executed in tests/test_sigma_rules.py.
+"""
 
 from pathlib import Path
 
@@ -23,6 +27,9 @@ def test_splunk_detection_loads():
     assert "-enc" in " ".join(det["condition_keywords"]).lower() or any(
         "enc" in k.lower() for k in det["condition_keywords"]
     )
+    # Sysmon field name, not the old fixture-only `command_line`
+    assert "CommandLine" in det["search"]
+    assert "command_line" not in det["search"]
 
 
 def test_defender_detection_loads():
@@ -46,12 +53,13 @@ def test_fixture_labeled_demo():
 def test_fixture_events_match_keywords(det_name):
     det = load_detection(det_name)
     keywords = det["condition_keywords"]
-    fix = load_fixture()
-    for event in fix["events"]:
-        matched = event_matches_keywords(event["command_line"], keywords)
-        assert matched is event["should_match"], (
-            f"{event['event_id']} expected should_match={event['should_match']} "
-            f"got {matched} for {det_name}"
+    legacy = [e for e in load_fixture()["events"] if e.get("legacy")]
+    assert len(legacy) == 4
+    for event in legacy:
+        expected = event["label"] == "malicious"
+        matched = event_matches_keywords(event["CommandLine"], keywords)
+        assert matched is expected, (
+            f"{event['event_id']} expected {event['label']} got matched={matched} for {det_name}"
         )
 
 
