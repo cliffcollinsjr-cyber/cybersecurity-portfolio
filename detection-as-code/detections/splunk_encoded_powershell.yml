@@ -1,0 +1,25 @@
+# [DEMO] Splunk-style detection definition (portfolio / detection-as-code lite)
+id: DET-SPLUNK-DEMO-001
+title: Encoded PowerShell command line
+platform: splunk
+status: experimental
+severity: high
+mitre:
+  - T1059.001
+description: >
+  Flags process events where PowerShell is invoked with encoded command
+  switches. Lab indexes only — tune allowlists before any production use.
+search: |
+  index=edr sourcetype=process
+  (process_name="powershell.exe" OR process_name="pwsh.exe")
+  (CommandLine="*-enc*" OR CommandLine="*-EncodedCommand*")
+  | stats count earliest(_time) as first_seen latest(_time) as last_seen by host, user, CommandLine
+  | where count > 0
+condition_keywords:
+  - powershell
+  - -enc
+  - -EncodedCommand
+false_positives:
+  - Signed enterprise automation that intentionally uses encoded commands (allowlist by parent + hash)
+references:
+  - ../edr parity: edr-microsoft-defender/kql/suspicious_powershell.kql
