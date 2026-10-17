@@ -11,6 +11,7 @@
 | Generated SPL snapshot | [`sigma/expected/`](./sigma/expected/) |
 | Splunk-style YAML (superseded; carries generated SPL) | [`detections/splunk_encoded_powershell.yml`](./detections/splunk_encoded_powershell.yml) |
 | Defender / KQL detection YAML | [`detections/defender_encoded_powershell.yml`](./detections/defender_encoded_powershell.yml) |
+| LSASS access rule (T1003.001) + ADS | [`sigma/proc_access_win_lsass_memory_access.yml`](./sigma/proc_access_win_lsass_memory_access.yml), [`sigma/proc_access_win_lsass_memory_access.ads.md`](./sigma/proc_access_win_lsass_memory_access.ads.md), KQL twin [`../edr-microsoft-defender/kql/rare_lsass_access.kql`](../edr-microsoft-defender/kql/rare_lsass_access.kql), tests [`tests/test_sigma_lsass.py`](./tests/test_sigma_lsass.py) |
 | Sample events fixture | [`fixtures/sample_events.json`](./fixtures/sample_events.json) |
 | Tests | [`tests/test_sigma_rules.py`](./tests/test_sigma_rules.py), [`tests/test_detections.py`](./tests/test_detections.py) |
 | Evaluators (Sigma / narrow SPL) | [`src/sigma_eval.py`](./src/sigma_eval.py), [`src/spl_eval.py`](./src/spl_eval.py) |

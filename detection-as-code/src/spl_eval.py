@@ -4,6 +4,7 @@ This is NOT Splunk. It understands only the shape the pySigma Splunk backend emi
 for the rules in this repo, and raises on anything else:
 
     <base search> [| regex <field>="<pcre>"]...
+    <base search> | rex field=F "(?<M>pcre)" | eval C=if(isnotnull(M), "true", "false") | search ...
 
 Base search: field=value, field!=value, field IN ("a", "b"), NOT, OR, parentheses,
 implicit AND. Splunk precedence is honoured (NOT > OR > AND, i.e. `a b OR c` is
@@ -124,11 +125,19 @@ class _Parser:
 
 
 _REGEX_CMD = re.compile(r'^regex\s+(?P<field>[A-Za-z_][\w.]*)\s*(?P<op>!?=)\s*(?P<re>"(?:[^"\\]|\\.)*")\s*$')
+# `| rex field=F "(?<Name>pcre)"` -- one named group spanning the whole pattern,
+# exactly as the pySigma Splunk backend emits for regex values inside OR/NOT.
+_REX_CMD = re.compile(r'^rex\s+field=(?P<field>[A-Za-z_][\w.]*)\s+(?P<re>"(?:[^"\\]|\\.)*")\s*$')
+_REX_BODY = re.compile(r'^\(\?<(?P<name>[A-Za-z_]\w*)>(?P<re>.*)\)$', re.DOTALL)
+# `| eval C=if(isnotnull(M), "true", "false")`
+_EVAL_CMD = re.compile(
+    r'^eval\s+(?P<out>[A-Za-z_]\w*)=if\(isnotnull\((?P<src>[A-Za-z_]\w*)\),\s*"true",\s*"false"\)\s*$'
+)
+_SEARCH_CMD = re.compile(r'^search\s+(?P<expr>.+)$', re.DOTALL)
 
 
-def split_query(spl: str) -> tuple[str, list[tuple[str, str, str]]]:
-    """Return (base_search, [(field, op, python_regex), ...])."""
-    # Pipes inside quoted strings must not split the query.
+def split_pipeline(spl: str) -> list[str]:
+    """Split on top-level pipes (pipes inside quoted strings do not split)."""
     parts, buf, in_str, esc = [], "", False, False
     for ch in spl:
         if in_str:
@@ -147,32 +156,85 @@ def split_query(spl: str) -> tuple[str, list[tuple[str, str, str]]]:
         else:
             buf += ch
     parts.append(buf)
+    return [p.strip() for p in parts]
+
+
+def split_query(spl: str) -> tuple[str, list[tuple[str, str, str]]]:
+    """Return (base_search, [(field, op, python_regex), ...]) for `| regex`-only queries."""
+    parts = split_pipeline(spl)
     base, cmds = parts[0], []
     for p in parts[1:]:
-        m = _REGEX_CMD.match(p.strip())
+        m = _REGEX_CMD.match(p)
         if not m:
-            raise NotImplementedError(f"Unsupported SPL command: {p.strip()!r}")
+            raise NotImplementedError(f"Unsupported SPL command: {p!r}")
         cmds.append((m["field"], m["op"], _unquote(m["re"])))
     return base, cmds
 
 
-def compile_spl(spl: str):
-    base, cmds = split_query(spl)
-    parser = _Parser(_tokens(base))
+def _compile_search(expr: str):
+    parser = _Parser(_tokens(expr))
     pred = parser.parse_and()
     if parser.peek()[0] is not None:
         raise NotImplementedError(f"Trailing SPL tokens: {parser.t[parser.i:]}")
-    regexes = [(f, op, re.compile(rx)) for f, op, rx in cmds]
+    return pred
+
+
+def compile_spl(spl: str):
+    """Compile `<base> [| regex ...] [| rex ... | eval ... | search ...]` to a predicate.
+
+    Each stage takes the (copied) event and either drops it (returns None) or passes
+    it on, possibly with fields added by rex/eval, mirroring Splunk's pipeline.
+    """
+    parts = split_pipeline(spl)
+    stages = []
+
+    pred0 = _compile_search(parts[0])
+    stages.append(lambda e, p=pred0: e if p(e) else None)
+
+    for part in parts[1:]:
+        if m := _REGEX_CMD.match(part):
+            f, op, rx = m["field"], m["op"], re.compile(_unquote(m["re"]))
+
+            def st(e, f=f, op=op, rx=rx):
+                val = e.get(f)
+                if val is None:
+                    return None  # Splunk `regex` drops events lacking the field
+                return e if (rx.search(str(val)) is not None) == (op == "=") else None
+
+        elif m := _REX_CMD.match(part):
+            body = _REX_BODY.match(_unquote(m["re"]))
+            if not body:
+                raise NotImplementedError(f"Unsupported rex pattern: {part!r}")
+            f, name, rx = m["field"], body["name"], re.compile(body["re"])
+
+            def st(e, f=f, name=name, rx=rx):
+                val = e.get(f)
+                hit = None if val is None else rx.search(str(val))
+                if hit is not None:
+                    e = {**e, name: hit.group(0)}
+                return e
+
+        elif m := _EVAL_CMD.match(part):
+            out, src = m["out"], m["src"]
+
+            def st(e, out=out, src=src):
+                return {**e, out: "true" if e.get(src) is not None else "false"}
+
+        elif m := _SEARCH_CMD.match(part):
+            p = _compile_search(m["expr"])
+
+            def st(e, p=p):
+                return e if p(e) else None
+
+        else:
+            raise NotImplementedError(f"Unsupported SPL command: {part!r}")
+        stages.append(st)
 
     def matches(event: dict[str, Any]) -> bool:
-        if not pred(event):
-            return False
-        for f, op, rx in regexes:
-            val = event.get(f)
-            if val is None:
-                return False  # Splunk `regex` drops events lacking the field
-            hit = rx.search(str(val)) is not None
-            if hit != (op == "="):
+        e: dict[str, Any] | None = dict(event)
+        for st in stages:
+            e = st(e)
+            if e is None:
                 return False
         return True
 
