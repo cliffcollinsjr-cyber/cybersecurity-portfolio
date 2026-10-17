@@ -31,9 +31,9 @@ jobs:
         working-directory: cloud-security/terraform/${{ matrix.cloud }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3 # production: pin to commit SHA
+        uses: hashicorp/setup-terraform@v4 # production: pin to commit SHA
         with:
           terraform_wrapper: false
       - name: terraform fmt -check
@@ -53,7 +53,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Checkov Terraform scan
         uses: bridgecrewio/checkov-action@v12 # production: pin to commit SHA
         with:
@@ -71,7 +71,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Trivy config / misconfig (fs)
         uses: aquasecurity/trivy-action@v0.36.0 # production: pin to commit SHA
         with:
@@ -80,6 +80,7 @@ jobs:
           exit-code: "1"
           severity: CRITICAL,HIGH
           hide-progress: true
+          trivyignores: .trivyignore
         continue-on-error: false
 
   dependency-review:
@@ -91,9 +92,11 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
+      # Requires Dependency graph: Settings → Code security → Dependency graph.
+      # Graph is enabled; enforce on PRs (main runs already succeeded).
       - name: Dependency review
-        uses: actions/dependency-review-action@v4 # production: pin to commit SHA
+        uses: actions/dependency-review-action@v5 # production: pin to commit SHA
         with:
           fail-on-severity: high
         continue-on-error: false
@@ -107,9 +110,9 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Setup Python
-        uses: actions/setup-python@v5 # production: pin to commit SHA
+        uses: actions/setup-python@v7 # production: pin to commit SHA
         with:
           python-version: "3.12"
       - name: pip-audit (Python requirements)

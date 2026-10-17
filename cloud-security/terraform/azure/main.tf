@@ -71,6 +71,14 @@ resource "azurerm_storage_account" "demo" {
     expiration_period = "90.00:00:00"
   }
 
+  # Trivy AVD-AZU-0012 / AZU-0012: default deny when no network rules match.
+  # DEMO uses a placeholder allow for lab CIDR — replace with private endpoint in real tenants.
+  network_rules {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+    ip_rules       = ["203.0.113.10"] # [DEMO] documentation RFC5737 TEST-NET
+  }
+
   tags = { Label = "DEMO" }
 }
 
