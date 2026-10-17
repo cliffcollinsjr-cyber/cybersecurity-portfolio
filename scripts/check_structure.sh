@@ -12,8 +12,11 @@ REQUIRED=(
   application-security
   security-research
   iac-cicd-security
+  detection-as-code
   LAB-ETHICS.md
   README.md
+  PERSONAL-LAB.md
+  RESUME-BULLETS.md
 )
 missing=0
 for item in "${REQUIRED[@]}"; do

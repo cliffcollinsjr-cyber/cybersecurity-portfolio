@@ -22,7 +22,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # production: pin to commit SHA
+        uses: actions/checkout@v7 # production: pin to commit SHA
       - name: Setup Python
         uses: actions/setup-python@v5 # production: pin to commit SHA
         with:
