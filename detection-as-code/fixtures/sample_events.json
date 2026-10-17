@@ -1,6 +1,6 @@
 {
   "label": "[DEMO]",
-  "description": "Synthetic Sysmon EventID 1 (process creation) events for detection-as-code tests. Field names follow Sysmon (Image, OriginalFileName, CommandLine, ParentImage). Base64 payloads decode to harmless cmdlets (Get-Date, Write-Output, ...).",
+  "description": "Synthetic Sysmon EventID 1 (process creation) events for detection-as-code tests. Field names follow Sysmon (Image, OriginalFileName, CommandLine, ParentImage). Base64 payloads decode to harmless cmdlets (Get-Date, Write-Output, ...). EventID 10 (process access) events use Sysmon ProcessAccess fields (SourceImage, TargetImage, GrantedAccess, CallTrace, SourceUser) for the LSASS rule.",
   "schema": {
     "label": "malicious|benign",
     "expected_rules": "rule ids that must fire (Sigma UUID / DET-* id); empty for benign",
@@ -319,6 +319,250 @@
       "OriginalFileName": "PowerShell.EXE",
       "CommandLine": "powershell.exe -c Get-Process | Out-File C:\\Temp\\procs.txt -en Unicode",
       "ParentImage": "C:\\Windows\\explorer.exe"
+    },
+    {
+      "event_id": "EVT-LSASS-001",
+      "label": "malicious",
+      "expected_rules": [
+        "d76f8bfa-378b-4735-8d64-6b08a570d754",
+        "DET-DEFENDER-LSASS-001"
+      ],
+      "description": "Mimikatz-like sekurlsa handle (0x1010) from a user-writable Downloads path",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "LAB\\jordan.lee",
+      "SourceImage": "C:\\Users\\jordan.lee\\Downloads\\mimikatz.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1010",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-002",
+      "label": "malicious",
+      "expected_rules": [
+        "d76f8bfa-378b-4735-8d64-6b08a570d754",
+        "DET-DEFENDER-LSASS-001"
+      ],
+      "description": "procdump -ma lsass: PROCESS_ALL_ACCESS 0x1fffff, MiniDumpWriteDump via dbghelp",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "LAB\\jordan.lee",
+      "SourceImage": "C:\\Tools\\Sysinternals\\procdump64.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1fffff",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e|C:\\Windows\\System32\\dbghelp.dll+1e4c7|C:\\Tools\\Sysinternals\\procdump64.exe+6a3c1"
+    },
+    {
+      "event_id": "EVT-LSASS-003",
+      "label": "malicious",
+      "expected_rules": [
+        "d76f8bfa-378b-4735-8d64-6b08a570d754",
+        "DET-DEFENDER-LSASS-001"
+      ],
+      "description": "rundll32 comsvcs.dll,MiniDump (0x1fffff) from a System32 path that is not allowlisted",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\SYSTEM",
+      "SourceImage": "C:\\Windows\\System32\\rundll32.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1fffff",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e|C:\\Windows\\System32\\dbgcore.dll+b3f1|C:\\Windows\\System32\\comsvcs.dll+3b1a9"
+    },
+    {
+      "event_id": "EVT-LSASS-004",
+      "label": "malicious",
+      "expected_rules": [
+        "d76f8bfa-378b-4735-8d64-6b08a570d754",
+        "DET-DEFENDER-LSASS-001"
+      ],
+      "description": "Renamed dumper in %TEMP% opening lsass with 0x1438",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "LAB\\alex.rivera",
+      "SourceImage": "C:\\Users\\alex.rivera\\AppData\\Local\\Temp\\svchost_upd.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1438",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-005",
+      "label": "malicious",
+      "expected_rules": [
+        "d76f8bfa-378b-4735-8d64-6b08a570d754"
+      ],
+      "description": "Injected code (UNKNOWN( call trace) inside csrss path reading lsass; Sigma CallTrace override fires, KQL has no call stack so the path allowlist suppresses it",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\SYSTEM",
+      "SourceImage": "C:\\Windows\\System32\\csrss.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1010",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e|UNKNOWN(000001A2B3C4D5E6)"
+    },
+    {
+      "event_id": "EVT-LSASS-006",
+      "label": "malicious",
+      "expected_rules": [
+        "d76f8bfa-378b-4735-8d64-6b08a570d754",
+        "DET-DEFENDER-LSASS-001"
+      ],
+      "description": "Handle duplication prep: PROCESS_DUP_HANDLE only (0x40) from ProgramData",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "LAB\\jordan.lee",
+      "SourceImage": "C:\\ProgramData\\updater\\hs.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x40",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-007",
+      "label": "malicious",
+      "expected_rules": [
+        "d76f8bfa-378b-4735-8d64-6b08a570d754",
+        "DET-DEFENDER-LSASS-001"
+      ],
+      "description": "Uppercase mask 0x143A (VM_READ set) from Public folder",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "LAB\\jordan.lee",
+      "SourceImage": "C:\\Users\\Public\\x.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x143A",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-008",
+      "label": "malicious",
+      "expected_rules": [
+        "d76f8bfa-378b-4735-8d64-6b08a570d754",
+        "DET-DEFENDER-LSASS-001"
+      ],
+      "description": "MsMpEng.exe name from a non-Defender path (filename-only allowlist would miss this)",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "LAB\\jordan.lee",
+      "SourceImage": "C:\\Users\\Public\\MsMpEng.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1010",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-020",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "Defender MsMpEng.exe from the platform path, 0x1fffff",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\SYSTEM",
+      "SourceImage": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24090.11-0\\MsMpEng.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1fffff",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e|C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24090.11-0\\mpsvc.dll+1a2b"
+    },
+    {
+      "event_id": "EVT-LSASS-021",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "svchost.exe from System32 with 0x1410",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\SYSTEM",
+      "SourceImage": "C:\\Windows\\System32\\svchost.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1410",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-022",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "wininit.exe parent of lsass, 0x1fffff",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\SYSTEM",
+      "SourceImage": "C:\\Windows\\System32\\wininit.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1fffff",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-023",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "csrss.exe expected access 0x1fffff",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\SYSTEM",
+      "SourceImage": "C:\\Windows\\System32\\csrss.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1fffff",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-024",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "Old KQL false positive: tool in \\Temp\\ with 0x1010 against a NON-lsass target",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "LAB\\sam.nguyen",
+      "SourceImage": "C:\\Users\\sam.nguyen\\AppData\\Local\\Temp\\helper.exe",
+      "TargetImage": "C:\\Windows\\System32\\notepad.exe",
+      "GrantedAccess": "0x1010",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-025",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "lsass access with 0x1000 (PROCESS_QUERY_LIMITED_INFORMATION only) from a user path",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "LAB\\jordan.lee",
+      "SourceImage": "C:\\Users\\jordan.lee\\AppData\\Local\\Programs\\app\\app.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1000",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-026",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "WmiPrvSE from System32\\wbem, 0x1410",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\NETWORK SERVICE",
+      "SourceImage": "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1410",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-027",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "System svchost.exe with 0x1400 (no VM_READ bit)",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\SYSTEM",
+      "SourceImage": "C:\\Windows\\System32\\svchost.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1400",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
+    },
+    {
+      "event_id": "EVT-LSASS-028",
+      "label": "benign",
+      "expected_rules": [],
+      "description": "VMware Tools vmtoolsd from its install path, 0x1fffff",
+      "EventID": 10,
+      "Computer": "lab-win10-19",
+      "SourceUser": "NT AUTHORITY\\SYSTEM",
+      "SourceImage": "C:\\Program Files\\VMware\\VMware Tools\\vmtoolsd.exe",
+      "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+      "GrantedAccess": "0x1fffff",
+      "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d204|C:\\Windows\\System32\\KERNELBASE.dll+2c13e"
     }
   ]
 }

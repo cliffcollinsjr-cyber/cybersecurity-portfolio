@@ -1,0 +1,4 @@
+EventID=10 TargetImage="*\\lsass.exe"
+| rex field=GrantedAccess "(?<GrantedAccessMatch>(?i)^0x[0-9a-f]*[13579bdf][0-9a-f]$)"
+| eval GrantedAccessCondition=if(isnotnull(GrantedAccessMatch), "true", "false")
+| search GrantedAccessCondition="true" OR GrantedAccess="0x40" CallTrace IN ("*\\dbghelp.dll*", "*\\dbgcore.dll*", "*UNKNOWN(*") OR NOT (SourceImage IN ("C:\\Windows\\System32\\csrss.exe", "C:\\Windows\\System32\\wininit.exe", "C:\\Windows\\System32\\lsm.exe", "C:\\Windows\\System32\\wbem\\WmiPrvSE.exe") OR (SourceImage="C:\\Windows\\System32\\svchost.exe" GrantedAccess="0x1410") OR (SourceImage="C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\*" SourceImage="*\\MsMpEng.exe") OR SourceImage="C:\\Program Files\\VMware\\VMware Tools\\vmtoolsd.exe")

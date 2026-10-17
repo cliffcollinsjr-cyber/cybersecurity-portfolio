@@ -1,8 +1,37 @@
-// [DEMO] Processes creating remote threads or accessing sensitive processes (illustrative)
-// Prefer DeviceEvents ActionType for production hunts; tune heavily before alerting.
+// [DEMO] LSASS memory access with read rights (lab rule; tune before alerting)
+// ATT&CK: TA0006 Credential Access / T1003.001 OS Credential Dumping: LSASS Memory
+// Id: DET-DEFENDER-LSASS-001
+// Sigma twin: detection-as-code/sigma/proc_access_win_lsass_memory_access.yml
+//   (id d76f8bfa-378b-4735-8d64-6b08a570d754). Keep the allowlists below in sync with it;
+//   tests/test_sigma_lsass.py parses these let-statements and checks parity on fixtures.
+// Source: DeviceEvents, ActionType "OpenProcessApiCall"; FileName is the target process,
+//   InitiatingProcessFolderPath the full path of the caller, AdditionalFields.DesiredAccess
+//   the requested access mask (integer). MDE does not record a call stack, so the Sigma
+//   CallTrace override (dbghelp/dbgcore/UNKNOWN) has no equivalent here.
+// The old version had no lsass filter and fired on any FolderPath containing \Temp\;
+//   that trigger is removed (a Temp path says nothing about LSASS access).
+let VmRead = 0x10;      // PROCESS_VM_READ
+let DupHandleOnly = 0x40; // PROCESS_DUP_HANDLE as the whole mask
+let AllowedSourcePaths = dynamic([
+    @"c:\windows\system32\csrss.exe",
+    @"c:\windows\system32\wininit.exe",
+    @"c:\windows\system32\lsm.exe",
+    @"c:\windows\system32\wbem\wmiprvse.exe",
+    @"c:\program files\vmware\vmware tools\vmtoolsd.exe"
+]);
+let SvchostPath = @"c:\windows\system32\svchost.exe";
+let SvchostAllowedAccess = 0x1410;
+let DefenderPlatformPrefix = @"c:\programdata\microsoft\windows defender\platform\";
 DeviceEvents
 | where Timestamp > ago(24h)
-| where ActionType in ("ProcessCreated", "OpenProcessApiCall")
-| where FileName has_any ("procdump", "mimikatz") or FolderPath has @"\Temp\"
-| project Timestamp, DeviceName, ActionType, FileName, FolderPath, InitiatingProcessAccountName
-| top 50 by Timestamp desc
+| where ActionType == "OpenProcessApiCall"
+| where FileName =~ "lsass.exe"
+| extend DesiredAccess = tolong(parse_json(AdditionalFields).DesiredAccess)
+| where binary_and(DesiredAccess, VmRead) == VmRead or DesiredAccess == DupHandleOnly
+| extend SourcePath = tolower(InitiatingProcessFolderPath)
+| where not(SourcePath in (AllowedSourcePaths))
+| where not(SourcePath == SvchostPath and DesiredAccess == SvchostAllowedAccess)
+| where not(SourcePath startswith DefenderPlatformPrefix and SourcePath endswith @"\msmpeng.exe")
+| project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFolderPath,
+          InitiatingProcessCommandLine, InitiatingProcessSHA256, FileName, DesiredAccess
+| order by Timestamp desc

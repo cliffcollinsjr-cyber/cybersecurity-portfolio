@@ -44,6 +44,9 @@ DEFENDER_ID = "DET-DEFENDER-DEMO-001"
 
 EVENTS = load_fixture()["events"]
 EVENT_IDS = [e["event_id"] for e in EVENTS]
+# Process-creation (Sysmon EventID 1) fixtures; EventID 10 fixtures belong to the
+# LSASS rule (tests/test_sigma_lsass.py) but every rule is still run on every event.
+PROC_EVENTS = [e for e in EVENTS if e["EventID"] == 1]
 
 
 def _raw_rule_yaml() -> dict:
@@ -121,9 +124,10 @@ def test_superseded_splunk_yaml_carries_generated_spl():
 # --- fixtures -----------------------------------------------------------------
 
 def test_fixture_schema():
-    labels = {e["label"] for e in EVENTS}
+    labels = {e["label"] for e in PROC_EVENTS}
     assert labels == {"malicious", "benign"}
-    for e in EVENTS:
+    assert {e["EventID"] for e in EVENTS} == {1, 10}
+    for e in PROC_EVENTS:
         assert "command_line" not in e, "use Sysmon field names (CommandLine)"
         for f in ("event_id", "EventID", "Image", "OriginalFileName", "CommandLine",
                   "ParentImage", "expected_rules", "description"):
@@ -139,7 +143,7 @@ def test_rule_fields_exist_in_fixtures():
     """Guards against the old CommandLine vs command_line mismatch."""
     for pipeline in (None, sysmon_pipeline()):
         fields = rule_fields(load_rule(RULE_PATH, pipeline))
-        for e in EVENTS:
+        for e in PROC_EVENTS:
             assert fields <= set(e), (e["event_id"], fields - set(e))
 
 
@@ -173,7 +177,7 @@ def test_generated_spl_on_fixture(event, spl_matcher):
 
 
 def test_sigma_rule_requires_eventid_1_after_pipeline(sysmon_rule):
-    mal = next(e for e in EVENTS if e["label"] == "malicious")
+    mal = next(e for e in PROC_EVENTS if e["label"] == "malicious")
     assert rule_matches(sysmon_rule, mal)
     assert not rule_matches(sysmon_rule, {**mal, "EventID": 3})
 
@@ -197,6 +201,9 @@ def test_defender_kql_regex_identical_to_sigma():
 @pytest.mark.parametrize("event", EVENTS, ids=EVENT_IDS)
 def test_defender_kql_logic_on_fixture(event):
     """Hand translation of the KQL where-clauses (Python re stands in for RE2)."""
+    if event["EventID"] != 1:  # DeviceProcessEvents only holds process creations
+        assert not _expected_fire(event, DEFENDER_ID)
+        return
     to_mde = {
         "FileName": ntpath.basename(event["Image"]),
         "ProcessVersionInfoOriginalFileName": event["OriginalFileName"],

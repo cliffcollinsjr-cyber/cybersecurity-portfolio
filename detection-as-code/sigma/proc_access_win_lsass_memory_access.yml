@@ -1,0 +1,61 @@
+title: LSASS Process Memory Access With Read Rights
+id: d76f8bfa-378b-4735-8d64-6b08a570d754
+status: experimental
+description: |
+    Detects a process opening a handle to lsass.exe with an access mask that includes
+    PROCESS_VM_READ (0x10), the right needed to read LSASS memory (Mimikatz sekurlsa,
+    MiniDumpWriteDump via procdump / comsvcs.dll / renamed tools), or exactly
+    PROCESS_DUP_HANDLE (0x40), used to duplicate an existing LSASS handle.
+    The VM_READ test is a bitmask check on the Sysmon hex string (second-lowest hex
+    digit odd) rather than a fixed list, so masks such as 0x1010, 0x1410, 0x1438,
+    0x143a, 0x1f1fff, 0x1f3fff and 0x1fffff all match and 0x1000 / 0x1400 do not.
+    Well-known Windows and Defender callers are excluded by full path. A call trace
+    through dbghelp/dbgcore or unbacked memory (UNKNOWN) fires even for those paths.
+    [DEMO] lab rule; Sysmon must be configured to log ProcessAccess for lsass.exe.
+references:
+    - https://attack.mitre.org/techniques/T1003/001/
+    - https://learn.microsoft.com/en-us/windows/win32/procthread/process-security-and-access-rights
+    - https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_access/proc_access_win_lsass_susp_access_flag.yml
+    - https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_access/proc_access_win_lsass_memdump.yml
+    - https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_access/proc_access_win_lsass_dump_comsvcs_dll.yml
+author: Cliff Collins Jr
+date: 2026-10-17
+tags:
+    - attack.credential-access
+    - attack.t1003.001
+logsource:
+    product: windows
+    category: process_access
+detection:
+    selection_target:
+        TargetImage|endswith: '\lsass.exe'
+    # PROCESS_VM_READ (0x10) is set when the second-lowest hex digit is odd.
+    # PROCESS_DUP_HANDLE alone (0x40) is kept as an exact value (handle duplication).
+    selection_access:
+        - GrantedAccess|re: '(?i)^0x[0-9a-f]*[13579bdf][0-9a-f]$'
+        - GrantedAccess: '0x40'
+    # High-signal call stacks: dump helpers or code running from unbacked memory.
+    selection_calltrace_susp:
+        CallTrace|contains:
+            - '\dbghelp.dll'
+            - '\dbgcore.dll'
+            - 'UNKNOWN('
+    filter_main_windows:
+        SourceImage:
+            - 'C:\Windows\System32\csrss.exe'
+            - 'C:\Windows\System32\wininit.exe'
+            - 'C:\Windows\System32\lsm.exe'
+            - 'C:\Windows\System32\wbem\WmiPrvSE.exe'
+    filter_main_svchost:
+        SourceImage: 'C:\Windows\System32\svchost.exe'
+        GrantedAccess: '0x1410'
+    filter_main_defender:
+        SourceImage|startswith: 'C:\ProgramData\Microsoft\Windows Defender\Platform\'
+        SourceImage|endswith: '\MsMpEng.exe'
+    filter_optional_vmtools:
+        SourceImage: 'C:\Program Files\VMware\VMware Tools\vmtoolsd.exe'
+    condition: selection_target and selection_access and (selection_calltrace_susp or not 1 of filter_*)
+falsepositives:
+    - EDR, AV, backup and monitoring agents not covered by the filters (add their exact install path, ideally with signer or hash)
+    - Administrators or IR staff taking an authorized LSASS dump (Task Manager, procdump); confirm against a change or case ticket
+level: high
